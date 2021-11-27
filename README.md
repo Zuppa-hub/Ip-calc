@@ -2,12 +2,12 @@
 # IP-Calc
 ## Progetto scolastico
 ### caratteristiche:
-*[x] Input indirizzi e subnet sia in decimale che in binario.
-*[x] Calcolo sottoreti per ogni classe
-*[x] Output sottoreti in binario o decimale che
+* ✔️ Input indirizzi e subnet sia in decimale che in binario.
+* ✔️ Calcolo sottoreti per ogni classe
+* ✔️ Output sottoreti in binario o decimale che
 ### Da aggiungere:
-*[-] mascher variabile 
-*[-] salvataggio su file
+* ❌ salvataggio su file
+* ❌ Maschera variabile
 ## Istruzioni per la compilazione
 #### Windows:
 Programmi necessari: MinGW 64bit
