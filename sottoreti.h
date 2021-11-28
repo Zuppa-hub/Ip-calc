@@ -157,16 +157,17 @@ int CreaSottoretiA(int ipdec[], int ipbin[], int ns)
     int nidTMP = 0;
     int DC[4];
     int *br, *nid;
-    long dim = ns * sizeof(int);
-    br = (int *)malloc(dim);
-    nid = (int *)malloc(dim);
-
     while (pow(2, i) <= ns)
         i++;
     bit = i;
+    pot = pow(2, i);
+
     if (bit <= 8)
     {
         pot = pow(2, i);
+        long dim = pot * sizeof(int);
+        br = (int *)malloc(dim);
+        nid = (int *)malloc(dim);
         intervallo = 256 / pot;
         nidTMP = 0;
         for (i = 0; i < ns; i++)
@@ -265,6 +266,9 @@ int CreaSottoretiA(int ipdec[], int ipbin[], int ns)
         {
             ott3 = bit - 8;
             pot = pow(2, ott3);
+            long dim = pot * sizeof(int);
+            br = (int *)malloc(dim);
+            nid = (int *)malloc(dim);
             intervallo = 256 / pot;
             for (j = 0; j < ns / pot; j++)
             {
@@ -377,6 +381,9 @@ int CreaSottoretiA(int ipdec[], int ipbin[], int ns)
         {
             ott2 = bit - 16;
             pot = pow(2, ott2);
+            long dim = pot * sizeof(int);
+            br = (int *)malloc(dim);
+            nid = (int *)malloc(dim);
             intervallo = 256 / pot;
             k = 0;
             printf("\nOra scelgi come visualizzarle\n");
@@ -419,19 +426,22 @@ int CreaSottoretiA(int ipdec[], int ipbin[], int ns)
                 printf("\nRETE\t\t\tNET ID\t\t\tBROADCAST\t\t\t\tGATEWAY\t\t\t\tPRIMO HOST\t\t\t\tULTIMO HOST\n");
                 cont = 0;
                 DC[0] = ipdec[0];
+                k = 0;
+                int y;
                 while (k <= ((ns / 256) / pot))
                 {
                     DC[1] = k;
-                    for (j = 0; j < 256; j++)
+                    for (y = 0; y < 256; y++)
                     {
-                        DC[2] = j;
+                        DC[2] = y;
                         nidTMP = 0;
                         for (i = 0; i < pot; i++)
                         {
                             *(nid + i) = nidTMP;
                             *(br + i) = nidTMP + intervallo - 1;
                             nidTMP = nidTMP + intervallo;
-                            printf("\t%d)", cont);
+
+                            printf("%d) ", cont);
                             DC[3] = *(nid + i);
                             decTobin(DC, ipbin);
                             for (j = 0; j < 32; j++)
@@ -495,9 +505,6 @@ int CreaSottoretiA(int ipdec[], int ipbin[], int ns)
 int CreaSottoretiB(int ipdec[], int ipbin[], int ns)
 {
     int *br, *nid;
-    long dim = ns * sizeof(int);
-    br = (int *)malloc(dim);
-    nid = (int *)malloc(dim);
     int pot = 0, i = 0, j = 0, cont = 0, ott3, k;
     int nidTMP = 0;
     int intervallo;
@@ -510,6 +517,9 @@ int CreaSottoretiB(int ipdec[], int ipbin[], int ns)
     if (pot <= 8)
     {
         pot = pow(2, i);
+        long dim = pot * sizeof(int);
+        br = (int *)malloc(dim);
+        nid = (int *)malloc(dim);
         intervallo = 256 / pot;
         nidTMP = 0;
 
@@ -604,8 +614,10 @@ int CreaSottoretiB(int ipdec[], int ipbin[], int ns)
     {
         ott3 = pot - 8;
         pot = pow(2, ott3);
+        long dim = pot * sizeof(int);
+        br = (int *)malloc(dim);
+        nid = (int *)malloc(dim);
         intervallo = 256 / pot;
-
         for (j = 0; j < ns / pot; j++)
         {
             nidTMP = 0;
