@@ -12,3 +12,15 @@ int inputscelta(int mass, int min)
     } while (scelta < min || scelta > mass);
     return scelta;
 }
+int errore(FILE *fp) //funzione per verificvare se un file esiste oppure no
+{
+    if (fopen("SottoretiMFissa.txt","r") == NULL)
+    {
+        printf("\nFile vuoto o non esistente");
+        fclose(fp);
+        return 0;
+    }
+    else
+        fclose(fp);
+    return 1;
+}

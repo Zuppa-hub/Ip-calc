@@ -1,15 +1,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <time.h>
 #include "DecToBin.h"
 
-int CreaSottoretiA(int ipdec[], int ipbin[], int ns);
-int CreaSottoretiB(int ipdec[], int ipbin[], int ns);
-void CreaSottoretiC(int ipdec[], int ipbin[], int ns);
-void subnet(int bit);
+int CreaSottoretiA(int ipdec[], int ipbin[], int ns, FILE *f);
+int CreaSottoretiB(int ipdec[], int ipbin[], int ns, FILE *f);
+void CreaSottoretiC(int ipdec[], int ipbin[], int ns, FILE *f);
+void subnet(int bit, int sceltaf, FILE *f);
 
 void CreaSottoreti(int classe, int ipdec[], int ipbin[], int ns)
 {
+    FILE *f;
     if (classe == 1)
     {
         if (ns >= pow(2, 21) || ns <= 0)
@@ -18,7 +20,7 @@ void CreaSottoreti(int classe, int ipdec[], int ipbin[], int ns)
         }
         else
         {
-            CreaSottoretiA(ipdec, ipbin, ns);
+            CreaSottoretiA(ipdec, ipbin, ns, f);
         }
     }
     else
@@ -31,7 +33,7 @@ void CreaSottoreti(int classe, int ipdec[], int ipbin[], int ns)
             }
             else
             {
-                CreaSottoretiB(ipdec, ipbin, ns);
+                CreaSottoretiB(ipdec, ipbin, ns, f);
             }
         }
         else
@@ -44,7 +46,7 @@ void CreaSottoreti(int classe, int ipdec[], int ipbin[], int ns)
                 }
                 else
                 {
-                    CreaSottoretiC(ipdec, ipbin, ns);
+                    CreaSottoretiC(ipdec, ipbin, ns, f);
                 }
             }
         }
@@ -55,7 +57,7 @@ void CreaSottoreti(int classe, int ipdec[], int ipbin[], int ns)
         printf("%d\n", classe);
     }
 }
-void CreaSottoretiC(int ipdec[], int ipbin[], int ns)
+void CreaSottoretiC(int ipdec[], int ipbin[], int ns, FILE *f)
 {
     //decTobin(ipdec,ipbin);
     //massimo 64
@@ -66,6 +68,30 @@ void CreaSottoretiC(int ipdec[], int ipbin[], int ns)
     int pot = 0, i = 0, j;
     int nidTMP = 0, brTMP = 0;
     int DC[4];
+    int scelta, sceltaf;
+    printf("Vuoi salvare i risultati su file?\n0=no 1=si`");
+    sceltaf = inputscelta(1, 0);
+    if (sceltaf == 1)
+    {
+        if (errore(f) == 0)
+        {
+            f = fopen("SottoretiMFissa.txt", "w");
+            printf("\nFile aperto in scrittura\n");
+        }
+        else
+        {
+            f = fopen("SottoretiMFissa.txt", "a");
+            printf("\nFile già esistente, scrittura in coda\n");
+        }
+
+        time_t t = time(NULL);
+        struct tm tm = *localtime(&t);
+        fprintf(f, "Classe c %d sottoreti\n", ns);
+        fprintf(f, "Sottoreti create in data: \n%d-%02d-%02d orario: %02d:%02d:%02d\n", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour + 1, tm.tm_min, tm.tm_sec);
+    }
+    else
+        printf("Non salverò su file.");
+
     while (ns >= pow(2, i))
         i++;
     int BitRete = i;
@@ -79,75 +105,176 @@ void CreaSottoretiC(int ipdec[], int ipbin[], int ns)
     }
     printf("\n\t\t\t\t**Sottoreti create**\nOra scelgi come visualizzarle\n");
     printf("1) Decimale\n2) Binario");
-    int scelta;
     scanf("%d", &scelta);
     switch (scelta)
     {
     case 1:
         printf("\n\tRETE\tNET ID\t\tBROADCAST\t\tGATEWAY\t\tPRIMO HOST\tULTIMO HOST\n");
-        for (i = 0; i < ns; i++)
-            printf("\t%d)\t%d.%d.%d.%d\t%d.%d.%d.%d\t\t%d.%d.%d.%d\t%d.%d.%d.%d\t%d.%d.%d.%d\n", i + 1, ipdec[0], ipdec[1], ipdec[2], *(nid + i), ipdec[0], ipdec[1], ipdec[2], *(br + i), ipdec[0], ipdec[1], ipdec[2], *(nid + i) + 1, ipdec[0], ipdec[1], ipdec[2], *(nid + i) + 2, ipdec[0], ipdec[1], ipdec[2], *(br + i) - 1);
-        subnet(BitRete + 24);
+        if (sceltaf == 1)
+        {
+            fprintf(f, "\n\tRETE\tNET ID\t\tBROADCAST\t\tGATEWAY\t\tPRIMO HOST\tULTIMO HOST\n");
+            for (i = 0; i < ns; i++)
+            {
+                printf("\t%d)\t%d.%d.%d.%d\t%d.%d.%d.%d\t\t%d.%d.%d.%d\t%d.%d.%d.%d\t%d.%d.%d.%d\n", i + 1, ipdec[0], ipdec[1], ipdec[2], *(nid + i), ipdec[0], ipdec[1], ipdec[2], *(br + i), ipdec[0], ipdec[1], ipdec[2], *(nid + i) + 1, ipdec[0], ipdec[1], ipdec[2], *(nid + i) + 2, ipdec[0], ipdec[1], ipdec[2], *(br + i) - 1);
+                fprintf(f, "\t%d)\t%d.%d.%d.%d\t%d.%d.%d.%d\t\t%d.%d.%d.%d\t%d.%d.%d.%d\t%d.%d.%d.%d\n", i + 1, ipdec[0], ipdec[1], ipdec[2], *(nid + i), ipdec[0], ipdec[1], ipdec[2], *(br + i), ipdec[0], ipdec[1], ipdec[2], *(nid + i) + 1, ipdec[0], ipdec[1], ipdec[2], *(nid + i) + 2, ipdec[0], ipdec[1], ipdec[2], *(br + i) - 1);
+            }
+            fclose(f);
+            subnet(BitRete + 24, 1, f);
+        }
+        else
+        {
+            for (i = 0; i < ns; i++)
+                printf("\t%d)\t%d.%d.%d.%d\t%d.%d.%d.%d\t\t%d.%d.%d.%d\t%d.%d.%d.%d\t%d.%d.%d.%d\n", i + 1, ipdec[0], ipdec[1], ipdec[2], *(nid + i), ipdec[0], ipdec[1], ipdec[2], *(br + i), ipdec[0], ipdec[1], ipdec[2], *(nid + i) + 1, ipdec[0], ipdec[1], ipdec[2], *(nid + i) + 2, ipdec[0], ipdec[1], ipdec[2], *(br + i) - 1);
+        }
+        subnet(BitRete + 24, 0, f);
+
         break;
     case 2:
         printf("\nRETE\t\t\tNET ID\t\t\tBROADCAST\t\t\t\tGATEWAY\t\t\t\tPRIMO HOST\t\t\t\tULTIMO HOST\n");
-        DC[0] = ipdec[0];
-        DC[1] = ipdec[1];
-        DC[2] = ipdec[2];
-        for (i = 0; i < ns; i++)
+        if (sceltaf == 1)
         {
-            printf("%d) ", i + 1);
-            DC[3] = *(nid + i);
-            decTobin(DC, ipbin);
-            for (j = 0; j < 32; j++)
+            fprintf(f, "\nRETE\t\t\tNET ID\t\t\tBROADCAST\t\t\t\tGATEWAY\t\t\t\tPRIMO HOST\t\t\t\tULTIMO HOST\n");
+            DC[0] = ipdec[0];
+            DC[1] = ipdec[1];
+            DC[2] = ipdec[2];
+            for (i = 0; i < ns; i++)
             {
-                printf("%d", ipbin[j]);
-                if (j == 7 || j == 15 || j == 23)
-                    printf(".");
+                printf("%d) ", i + 1);
+                fprintf(f, "%d) ", i + 1);
+                DC[3] = *(nid + i);
+                decTobin(DC, ipbin);
+                for (j = 0; j < 32; j++)
+                {
+                    fprintf(f, "%d", ipbin[j]);
+                    printf("%d", ipbin[j]);
+                    if (j == 7 || j == 15 || j == 23)
+                    {
+                        printf(".");
+                        fprintf(f, ".");
+                    }
+                }
+                fprintf(f, "  ");
+                printf("  ");
+                DC[3] = *(br + i);
+                decTobin(DC, ipbin);
+                for (j = 0; j < 32; j++)
+                {
+                    fprintf(f, "%d", ipbin[j]);
+                    printf("%d", ipbin[j]);
+                    if (j == 7 || j == 15 || j == 23)
+                    {
+                        printf(".");
+                        fprintf(f, ".");
+                    }
+                }
+                fprintf(f, "  ");
+                printf("  ");
+                DC[3] = *(nid + i) + 1;
+                decTobin(DC, ipbin);
+                for (j = 0; j < 32; j++)
+                {
+                    fprintf(f, "%d", ipbin[j]);
+                    printf("%d", ipbin[j]);
+                    if (j == 7 || j == 15 || j == 23)
+                    {
+                        printf(".");
+                        fprintf(f, ".");
+                    }
+                }
+                fprintf(f, "  ");
+                printf("  ");
+                DC[3] = *(nid + i) + 2;
+                decTobin(DC, ipbin);
+                for (j = 0; j < 32; j++)
+                {
+                    fprintf(f, "%d", ipbin[j]);
+                    printf("%d", ipbin[j]);
+                    if (j == 7 || j == 15 || j == 23)
+                    {
+                        printf(".");
+                        fprintf(f, ".");
+                    }
+                }
+                fprintf(f, "  ");
+                printf("  ");
+                DC[3] = *(br + i) - 1;
+                decTobin(DC, ipbin);
+                for (j = 0; j < 32; j++)
+                {
+                    fprintf(f, "%d", ipbin[j]);
+                    printf("%d", ipbin[j]);
+                    if (j == 7 || j == 15 || j == 23)
+                    {
+                        printf(".");
+                        fprintf(f, ".");
+                    }
+                }
+                fprintf(f, "\n");
+                printf("\n");
             }
-            printf("  ");
-            DC[3] = *(br + i);
-            decTobin(DC, ipbin);
-            for (j = 0; j < 32; j++)
-            {
-                printf("%d", ipbin[j]);
-                if (j == 7 || j == 15 || j == 23)
-                    printf(".");
-            }
-            printf("  ");
-            DC[3] = *(nid + i) + 1;
-            decTobin(DC, ipbin);
-            for (j = 0; j < 32; j++)
-            {
-                printf("%d", ipbin[j]);
-                if (j == 7 || j == 15 || j == 23)
-                    printf(".");
-            }
-            printf("  ");
-            DC[3] = *(nid + i) + 2;
-            decTobin(DC, ipbin);
-            for (j = 0; j < 32; j++)
-            {
-                printf("%d", ipbin[j]);
-                if (j == 7 || j == 15 || j == 23)
-                    printf(".");
-            }
-            printf("  ");
-            DC[3] = *(br + i) - 1;
-            decTobin(DC, ipbin);
-            for (j = 0; j < 32; j++)
-            {
-                printf("%d", ipbin[j]);
-                if (j == 7 || j == 15 || j == 23)
-                    printf(".");
-            }
-            printf("\n");
+            fclose(f);
+            subnet(BitRete + 24, 1, f);
         }
-        subnet(BitRete + 24);
+        else
+        {
+            DC[0] = ipdec[0];
+            DC[1] = ipdec[1];
+            DC[2] = ipdec[2];
+            for (i = 0; i < ns; i++)
+            {
+                printf("%d) ", i + 1);
+                DC[3] = *(nid + i);
+                decTobin(DC, ipbin);
+                for (j = 0; j < 32; j++)
+                {
+                    printf("%d", ipbin[j]);
+                    if (j == 7 || j == 15 || j == 23)
+                        printf(".");
+                }
+                printf("  ");
+                DC[3] = *(br + i);
+                decTobin(DC, ipbin);
+                for (j = 0; j < 32; j++)
+                {
+                    printf("%d", ipbin[j]);
+                    if (j == 7 || j == 15 || j == 23)
+                        printf(".");
+                }
+                printf("  ");
+                DC[3] = *(nid + i) + 1;
+                decTobin(DC, ipbin);
+                for (j = 0; j < 32; j++)
+                {
+                    printf("%d", ipbin[j]);
+                    if (j == 7 || j == 15 || j == 23)
+                        printf(".");
+                }
+                printf("  ");
+                DC[3] = *(nid + i) + 2;
+                decTobin(DC, ipbin);
+                for (j = 0; j < 32; j++)
+                {
+                    printf("%d", ipbin[j]);
+                    if (j == 7 || j == 15 || j == 23)
+                        printf(".");
+                }
+                printf("  ");
+                DC[3] = *(br + i) - 1;
+                decTobin(DC, ipbin);
+                for (j = 0; j < 32; j++)
+                {
+                    printf("%d", ipbin[j]);
+                    if (j == 7 || j == 15 || j == 23)
+                        printf(".");
+                }
+                printf("\n");
+            }
+            subnet(BitRete + 24, 0, f);
+        }
         break;
     }
 }
-int CreaSottoretiA(int ipdec[], int ipbin[], int ns)
+int CreaSottoretiA(int ipdec[], int ipbin[], int ns, FILE *f)
 {
     int i = 0, j = 0, k = 0, cont = 0;
     int bit;
@@ -157,6 +284,30 @@ int CreaSottoretiA(int ipdec[], int ipbin[], int ns)
     int nidTMP = 0;
     int DC[4];
     int *br, *nid;
+    int scelta, sceltaf;
+    printf("Vuoi salvare i risultati su file?\n0=no 1=si`");
+    sceltaf = inputscelta(1, 0);
+    if (sceltaf == 1)
+    {
+        if (errore(f) == 0)
+        {
+            f = fopen("SottoretiMFissa.txt", "w");
+            printf("\nFile aperto in scrittura\n");
+        }
+        else
+        {
+            f = fopen("SottoretiMFissa.txt", "a");
+            printf("\nFile già esistente, scrittura in coda\n");
+        }
+
+        time_t t = time(NULL);
+        struct tm tm = *localtime(&t);
+        fprintf(f, "Classe c %d sottoreti\n", ns);
+        fprintf(f, "Sottoreti create in data: \n%d-%02d-%02d orario: %02d:%02d:%02d\n", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour + 1, tm.tm_min, tm.tm_sec);
+    }
+    else
+        printf("Non salverò su file.");
+
     while (pow(2, i) <= ns)
         i++;
     bit = i;
@@ -164,6 +315,7 @@ int CreaSottoretiA(int ipdec[], int ipbin[], int ns)
 
     if (bit <= 8)
     {
+
         pot = pow(2, i);
         long dim = pot * sizeof(int);
         br = (int *)malloc(dim);
@@ -178,85 +330,196 @@ int CreaSottoretiA(int ipdec[], int ipbin[], int ns)
         }
         printf("\n\t\t\t\t**Sottoreti create**\nOra scelgi come visualizzarle\n");
         printf("1) Decimale\n2) Binario");
-        int scelta;
+
         scanf("%d", &scelta);
         switch (scelta)
         {
         case 1:
             printf("\n\tRETE\tNET ID\t\tBROADCAST\t\tGATEWAY\t\tPRIMO HOST\tULTIMO HOST\n");
-            for (i = 0; i < ns; i++)
+            if (sceltaf == 1)
             {
-                printf("\t%d)", i + 1);
-                printf("\t%d.%d.0.0", ipdec[0], *(nid + i));
-                printf("\t%d.%d.255.255", ipdec[0], *(br + i));
-                printf("\t%d.%d.0.1", ipdec[0], *(nid + i));
-                printf("\t%d.%d.0.2", ipdec[0], *(nid + i));
-                printf("\t%d.%d.255.254\n", ipdec[0], *(br + i));
+                for (i = 0; i < ns; i++)
+                {
+                    printf("\t%d) ", i + 1);
+                    printf("\t%d.%d.0.0", ipdec[0], *(nid + i));
+                    printf("\t%d.%d.255.255", ipdec[0], *(br + i));
+                    printf("\t%d.%d.0.1", ipdec[0], *(nid + i));
+                    printf("\t%d.%d.0.2", ipdec[0], *(nid + i));
+                    printf("\t%d.%d.255.254\n", ipdec[0], *(br + i));
+                    fprintf(f, "\t%d) \t%d.%d.0.0\t%d.%d.0.1\t%d.%d.0.1\t%d.%d.0.2\t%d.%d.255.254\n", i + 1, ipdec[0], *(nid + i), ipdec[0], *(br + i), ipdec[0], *(nid + i), ipdec[0], *(nid + i), ipdec[0], *(br + i));
+                }
+                fclose(f);
+                subnet(bit + 8, 1, f);
             }
-            subnet(bit + 8);
+            else
+            {
+                for (i = 0; i < ns; i++)
+                {
+                    printf("\t%d)", i + 1);
+                    printf("\t%d.%d.0.0", ipdec[0], *(nid + i));
+                    printf("\t%d.%d.255.255", ipdec[0], *(br + i));
+                    printf("\t%d.%d.0.1", ipdec[0], *(nid + i));
+                    printf("\t%d.%d.0.2", ipdec[0], *(nid + i));
+                    printf("\t%d.%d.255.254\n", ipdec[0], *(br + i));
+                }
+                subnet(bit + 8, 0, f);
+            }
             break;
         case 2:
             printf("\nRETE\t\t\tNET ID\t\t\tBROADCAST\t\t\t\tGATEWAY\t\t\t\tPRIMO HOST\t\t\t\tULTIMO HOST\n");
             DC[0] = ipdec[0];
-            for (i = 0; i < ns; i++)
+            if (sceltaf == 1)
             {
-                printf("%d) ", i + 1);
-                DC[1] = *(nid + i);
-                DC[2] = 0;
-                DC[3] = 0;
-                decTobin(DC, ipbin);
-                for (j = 0; j < 32; j++)
+                for (i = 0; i < ns; i++)
                 {
-                    printf("%d", ipbin[j]);
-                    if (j == 7 || j == 15 || j == 23)
-                        printf(".");
+                    printf("%d) ", i + 1);
+                    fprintf(f, "%d) ", i + 1);
+                    DC[1] = *(nid + i);
+                    DC[2] = 0;
+                    DC[3] = 0;
+                    decTobin(DC, ipbin);
+                    for (j = 0; j < 32; j++)
+                    {
+                        printf("%d", ipbin[j]);
+                        fprintf(f, "%d", ipbin[j]);
+                        if (j == 7 || j == 15 || j == 23)
+                        {
+                            printf(".");
+                            fprintf(f, ".");
+                        }
+                    }
+                    printf("  ");
+                    fprintf(f, "  ");
+                    DC[1] = *(br + i);
+                    DC[2] = 255;
+                    DC[3] = 255;
+                    decTobin(DC, ipbin);
+                    for (j = 0; j < 32; j++)
+                    {
+                        printf("%d", ipbin[j]);
+                        fprintf(f, "%d", ipbin[j]);
+                        if (j == 7 || j == 15 || j == 23)
+                        {
+                            printf(".");
+                            fprintf(f, ".");
+                        }
+                    }
+                    printf("  ");
+                    fprintf(f, "  ");
+                    DC[1] = *(nid + i);
+                    DC[2] = 0;
+                    DC[3] = 1;
+                    decTobin(DC, ipbin);
+                    for (j = 0; j < 32; j++)
+                    {
+                        printf("%d", ipbin[j]);
+                        fprintf(f, "%d", ipbin[j]);
+                        if (j == 7 || j == 15 || j == 23)
+                        {
+                            printf(".");
+                            fprintf(f, ".");
+                        }
+                    }
+                    printf("  ");
+                    fprintf(f, "  ");
+                    DC[1] = *(nid + i);
+                    DC[2] = 0;
+                    DC[3] = 2;
+                    decTobin(DC, ipbin);
+                    for (j = 0; j < 32; j++)
+                    {
+                        printf("%d", ipbin[j]);
+                        fprintf(f, "%d", ipbin[j]);
+                        if (j == 7 || j == 15 || j == 23)
+                        {
+                            printf(".");
+                            fprintf(f, ".");
+                        }
+                    }
+                    printf("  ");
+                    fprintf(f, "  ");
+                    DC[1] = *(br + i);
+                    DC[2] = 255;
+                    DC[3] = 254;
+                    decTobin(DC, ipbin);
+                    for (j = 0; j < 32; j++)
+                    {
+                        printf("%d", ipbin[j]);
+                        fprintf(f, "%d", ipbin[j]);
+                        if (j == 7 || j == 15 || j == 23)
+                        {
+                            printf(".");
+                            fprintf(f, ".");
+                        }
+                    }
+                    fprintf(f, "\n");
+                    printf("\n");
                 }
-                printf("  ");
-                DC[1] = *(br + i);
-                DC[2] = 255;
-                DC[3] = 255;
-                decTobin(DC, ipbin);
-                for (j = 0; j < 32; j++)
-                {
-                    printf("%d", ipbin[j]);
-                    if (j == 7 || j == 15 || j == 23)
-                        printf(".");
-                }
-                DC[1] = *(nid + i);
-                DC[2] = 0;
-                DC[3] = 1;
-                decTobin(DC, ipbin);
-                for (j = 0; j < 32; j++)
-                {
-                    printf("%d", ipbin[j]);
-                    if (j == 7 || j == 15 || j == 23)
-                        printf(".");
-                }
-                printf("  ");
-                DC[1] = *(nid + i);
-                DC[2] = 0;
-                DC[3] = 2;
-                decTobin(DC, ipbin);
-                for (j = 0; j < 32; j++)
-                {
-                    printf("%d", ipbin[j]);
-                    if (j == 7 || j == 15 || j == 23)
-                        printf(".");
-                }
-                printf("  ");
-                DC[1] = *(br + i);
-                DC[2] = 255;
-                DC[3] = 254;
-                decTobin(DC, ipbin);
-                for (j = 0; j < 32; j++)
-                {
-                    printf("%d", ipbin[j]);
-                    if (j == 7 || j == 15 || j == 23)
-                        printf(".");
-                }
-                printf("\n");
+                fclose(f);
+                subnet(bit + 8, 1, f);
             }
-            subnet(bit + 8);
+            else
+            {
+                for (i = 0; i < ns; i++)
+                {
+                    printf("%d) ", i + 1);
+                    DC[1] = *(nid + i);
+                    DC[2] = 0;
+                    DC[3] = 0;
+                    decTobin(DC, ipbin);
+                    for (j = 0; j < 32; j++)
+                    {
+                        printf("%d", ipbin[j]);
+                        if (j == 7 || j == 15 || j == 23)
+                            printf(".");
+                    }
+                    printf("  ");
+                    DC[1] = *(br + i);
+                    DC[2] = 255;
+                    DC[3] = 255;
+                    decTobin(DC, ipbin);
+                    for (j = 0; j < 32; j++)
+                    {
+                        printf("%d", ipbin[j]);
+                        if (j == 7 || j == 15 || j == 23)
+                            printf(".");
+                    }
+                    DC[1] = *(nid + i);
+                    DC[2] = 0;
+                    DC[3] = 1;
+                    decTobin(DC, ipbin);
+                    for (j = 0; j < 32; j++)
+                    {
+                        printf("%d", ipbin[j]);
+                        if (j == 7 || j == 15 || j == 23)
+                            printf(".");
+                    }
+                    printf("  ");
+                    DC[1] = *(nid + i);
+                    DC[2] = 0;
+                    DC[3] = 2;
+                    decTobin(DC, ipbin);
+                    for (j = 0; j < 32; j++)
+                    {
+                        printf("%d", ipbin[j]);
+                        if (j == 7 || j == 15 || j == 23)
+                            printf(".");
+                    }
+                    printf("  ");
+                    DC[1] = *(br + i);
+                    DC[2] = 255;
+                    DC[3] = 254;
+                    decTobin(DC, ipbin);
+                    for (j = 0; j < 32; j++)
+                    {
+                        printf("%d", ipbin[j]);
+                        if (j == 7 || j == 15 || j == 23)
+                            printf(".");
+                    }
+                    printf("\n");
+                }
+                subnet(bit + 8, 0, f);
+            }
             break;
         }
     }
@@ -270,16 +533,6 @@ int CreaSottoretiA(int ipdec[], int ipbin[], int ns)
             br = (int *)malloc(dim);
             nid = (int *)malloc(dim);
             intervallo = 256 / pot;
-            for (j = 0; j < ns / pot; j++)
-            {
-                nidTMP = 0;
-                for (i = 0; i < pot; i++)
-                {
-                    *(nid + i) = nidTMP;
-                    *(br + i) = nidTMP + intervallo - 1;
-                    nidTMP = nidTMP + intervallo;
-                }
-            }
             printf("\n\t\t\t\t**Sottoreti create**\nOra scelgi come visualizzarle\n");
             printf("1) Decimale\n2) Binario");
             int scelta;
@@ -287,11 +540,42 @@ int CreaSottoretiA(int ipdec[], int ipbin[], int ns)
             switch (scelta)
             {
             case 1:
-                for (j = 0; j < ns / pot; j++)
+                printf("\n\tRETE\tNET ID\t\tBROADCAST\t\tGATEWAY\t\tPRIMO HOST\tULTIMO HOST\n");
+                if (sceltaf == 1)
                 {
-                    printf("\n\tRETE\tNET ID\t\tBROADCAST\t\tGATEWAY\t\tPRIMO HOST\tULTIMO HOST\n");
+                    for (j = 0; j < ns / pot; j++)
+                    {
+                        nidTMP = 0;
+                        for (i = 0; i < pot; i++)
+                        {
+                            *(nid + i) = nidTMP;
+                            *(br + i) = nidTMP + intervallo - 1;
+                            nidTMP = nidTMP + intervallo;
+                            cont++;
+                            printf("\t%d)", cont);
+                            printf("\t%d.%d.%d.0", ipdec[0], j, *(nid + i));
+                            printf("\t%d.%d.%d.255", ipdec[0], j, *(br + i));
+                            printf("\t%d.%d.%d.1", ipdec[0], j, *(nid + i));
+                            printf("\t%d.%d.%d.2", ipdec[0], j, *(nid + i));
+                            printf("\t%d.%d.%d.254\n", ipdec[0], j, *(br + i));
+                            fprintf(f, "\t%d)\t%d.%d.%d.0\t%d.%d.%d.255\t%d.%d.%d.1\t%d.%d.%d.2\t%d.%d.%d.254\n", cont, ipdec[0], j, *(nid + i), ipdec[0], j, *(br + i), ipdec[0], j, *(nid + i), ipdec[0], j, *(nid + i), ipdec[0], j, *(br + i));
+                            if (cont == ns)
+                            {
+                                fclose(f);
+                                subnet(bit + 8, 1, f);
+                                return 0;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    nidTMP = 0;
                     for (i = 0; i < pot; i++)
                     {
+                        *(nid + i) = nidTMP;
+                        *(br + i) = nidTMP + intervallo - 1;
+                        nidTMP = nidTMP + intervallo;
                         cont++;
                         printf("\t%d)", cont);
                         printf("\t%d.%d.%d.0", ipdec[0], j, *(nid + i));
@@ -301,7 +585,7 @@ int CreaSottoretiA(int ipdec[], int ipbin[], int ns)
                         printf("\t%d.%d.%d.254\n", ipdec[0], j, *(br + i));
                         if (cont == ns)
                         {
-                            subnet(bit + 8);
+                            subnet(bit + 8, 0, f);
                             return 0;
                         }
                     }
@@ -310,67 +594,171 @@ int CreaSottoretiA(int ipdec[], int ipbin[], int ns)
             case 2:
                 printf("\nRETE\t\t\tNET ID\t\t\tBROADCAST\t\t\t\tGATEWAY\t\t\t\tPRIMO HOST\t\t\t\tULTIMO HOST\n");
                 DC[0] = ipdec[0];
-                for (j = 0; j < ns / pot; j++)
+                if (sceltaf == 1)
                 {
-                    DC[1] = j;
-                    for (i = 0; i < pot; i++)
+                    for (j = 0; j < ns / pot; j++)
                     {
-                        cont++;
-                        printf("\t%d)", cont);
+                        DC[1] = j;
+                        nidTMP = 0;
+                        for (i = 0; i < pot; i++)
+                        {
+                            *(nid + i) = nidTMP;
+                            *(br + i) = nidTMP + intervallo - 1;
+                            nidTMP = nidTMP + intervallo;
+                            cont++;
+                            printf("\t%d)", cont);
+                            fprintf(f, "\t%d)", cont);
+                            DC[2] = *(nid + i);
+                            DC[3] = 0;
+                            decTobin(DC, ipbin);
+                            for (j = 0; j < 32; j++)
+                            {
+                                printf("%d", ipbin[j]);
+                                fprintf(f, "%d", ipbin[j]);
+                                if (j == 7 || j == 15 || j == 23)
+                                {
+                                    printf(".");
+                                    fprintf(f, ".");
+                                }
+                            }
+                            printf("  ");
+                            fprintf(f, "  ");
+                            DC[2] = *(br + i);
+                            DC[3] = 255;
+                            decTobin(DC, ipbin);
+                            for (j = 0; j < 32; j++)
+                            {
+                                printf("%d", ipbin[j]);
+                                fprintf(f, "%d", ipbin[j]);
+                                if (j == 7 || j == 15 || j == 23)
+                                {
+                                    printf(".");
+                                    fprintf(f, ".");
+                                }
+                            }
+                            printf("  ");
+                            fprintf(f, "  ");
+                            DC[2] = *(nid + i);
+                            DC[3] = 1;
+                            decTobin(DC, ipbin);
+                            for (j = 0; j < 32; j++)
+                            {
+                                printf("%d", ipbin[j]);
+                                fprintf(f, "%d", ipbin[j]);
+                                if (j == 7 || j == 15 || j == 23)
+                                {
+                                    printf(".");
+                                    fprintf(f, ".");
+                                }
+                            }
+                            printf("  ");
+                            fprintf(f, "  ");
+                            DC[3] = 2;
+                            decTobin(DC, ipbin);
+                            for (j = 0; j < 32; j++)
+                            {
+                                printf("%d", ipbin[j]);
+                                fprintf(f, "%d", ipbin[j]);
+                                if (j == 7 || j == 15 || j == 23)
+                                {
+                                    printf(".");
+                                    fprintf(f, ".");
+                                }
+                            }
+                            printf("  ");
+                            fprintf(f, "  ");
+                            DC[2] = *(br + i);
+                            DC[3] = 254;
+                            decTobin(DC, ipbin);
+                            for (j = 0; j < 32; j++)
+                            {
+                                printf("%d", ipbin[j]);
+                                fprintf(f, "%d", ipbin[j]);
+                                if (j == 7 || j == 15 || j == 23)
+                                {
+                                    printf(".");
+                                    fprintf(f, ".");
+                                }
+                            }
+                            printf("\n");
+                            fprintf(f, "\n");
+                            if (cont == ns)
+                            {
+                                fclose(f);
+                                subnet(bit + 8, 1, f);
+                                return 0;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    for (j = 0; j < ns / pot; j++)
+                    {
+                        DC[1] = j;
+                        nidTMP = 0;
+                        for (i = 0; i < pot; i++)
+                        {
+                            *(nid + i) = nidTMP;
+                            *(br + i) = nidTMP + intervallo - 1;
+                            nidTMP = nidTMP + intervallo;
+                            cont++;
+                            printf("\t%d)", cont);
 
-                        DC[2] = *(nid + i);
-                        DC[3] = 0;
-                        decTobin(DC, ipbin);
-                        for (j = 0; j < 32; j++)
-                        {
-                            printf("%d", ipbin[j]);
-                            if (j == 7 || j == 15 || j == 23)
-                                printf(".");
-                        }
-                        printf("  ");
-                        DC[2] = *(br + i);
-                        DC[3] = 255;
-                        decTobin(DC, ipbin);
-                        for (j = 0; j < 32; j++)
-                        {
-                            printf("%d", ipbin[j]);
-                            if (j == 7 || j == 15 || j == 23)
-                                printf(".");
-                        }
-                        printf("  ");
-                        DC[2] = *(nid + i);
-                        DC[3] = 1;
-                        decTobin(DC, ipbin);
-                        for (j = 0; j < 32; j++)
-                        {
-                            printf("%d", ipbin[j]);
-                            if (j == 7 || j == 15 || j == 23)
-                                printf(".");
-                        }
-                        printf("  ");
-                        DC[3] = 2;
-                        decTobin(DC, ipbin);
-                        for (j = 0; j < 32; j++)
-                        {
-                            printf("%d", ipbin[j]);
-                            if (j == 7 || j == 15 || j == 23)
-                                printf(".");
-                        }
-                        printf("  ");
-                        DC[2] = *(br + i);
-                        DC[3] = 254;
-                        decTobin(DC, ipbin);
-                        for (j = 0; j < 32; j++)
-                        {
-                            printf("%d", ipbin[j]);
-                            if (j == 7 || j == 15 || j == 23)
-                                printf(".");
-                        }
-                        printf("\n");
-                        if (cont == ns)
-                        {
-                            subnet(bit + 8);
-                            return 0;
+                            DC[2] = *(nid + i);
+                            DC[3] = 0;
+                            decTobin(DC, ipbin);
+                            for (j = 0; j < 32; j++)
+                            {
+                                printf("%d", ipbin[j]);
+                                if (j == 7 || j == 15 || j == 23)
+                                    printf(".");
+                            }
+                            printf("  ");
+                            DC[2] = *(br + i);
+                            DC[3] = 255;
+                            decTobin(DC, ipbin);
+                            for (j = 0; j < 32; j++)
+                            {
+                                printf("%d", ipbin[j]);
+                                if (j == 7 || j == 15 || j == 23)
+                                    printf(".");
+                            }
+                            printf("  ");
+                            DC[2] = *(nid + i);
+                            DC[3] = 1;
+                            decTobin(DC, ipbin);
+                            for (j = 0; j < 32; j++)
+                            {
+                                printf("%d", ipbin[j]);
+                                if (j == 7 || j == 15 || j == 23)
+                                    printf(".");
+                            }
+                            printf("  ");
+                            DC[3] = 2;
+                            decTobin(DC, ipbin);
+                            for (j = 0; j < 32; j++)
+                            {
+                                printf("%d", ipbin[j]);
+                                if (j == 7 || j == 15 || j == 23)
+                                    printf(".");
+                            }
+                            printf("  ");
+                            DC[2] = *(br + i);
+                            DC[3] = 254;
+                            decTobin(DC, ipbin);
+                            for (j = 0; j < 32; j++)
+                            {
+                                printf("%d", ipbin[j]);
+                                if (j == 7 || j == 15 || j == 23)
+                                    printf(".");
+                            }
+                            printf("\n");
+                            if (cont == ns)
+                            {
+                                subnet(bit + 8, 0, f);
+                                return 0;
+                            }
                         }
                     }
                 }
@@ -395,31 +783,65 @@ int CreaSottoretiA(int ipdec[], int ipbin[], int ns)
             case 1:
                 cont = 0;
                 printf("\n\tRETE\tNET ID\t\tBROADCAST\t\tGATEWAY\t\tPRIMO HOST\tULTIMO HOST\n");
-                while (k <= ((ns / 256) / pot))
+                if (sceltaf == 1)
                 {
-                    for (j = 0; j < 256; j++)
+                    while (k <= ((ns / 256) / pot))
                     {
-                        nidTMP = 0;
-                        for (i = 0; i < pot; i++)
+                        for (j = 0; j < 256; j++)
                         {
-                            *(nid + i) = nidTMP;
-                            *(br + i) = nidTMP + intervallo - 1;
-                            nidTMP = nidTMP + intervallo;
-                            printf("\t%d)", cont);
-                            printf("\t%d.%d.%d.%d", ipdec[0], k, j, *(nid + i));
-                            printf("\t\t%d.%d.%d.%d", ipdec[0], k, j, *(br + i));
-                            printf("\t%d.%d.%d.%d", ipdec[0], k, j, *(nid + i) + 1);
-                            printf("\t%d.%d.%d.%d", ipdec[0], k, j, *(nid + i) + 2);
-                            printf("\t%d.%d.%d.%d\n", ipdec[0], k, j, *(br + i) - 1);
-                            if (cont == ns)
+                            nidTMP = 0;
+                            for (i = 0; i < pot; i++)
                             {
-                                subnet(bit + 8);
-                                return 0;
+                                *(nid + i) = nidTMP;
+                                *(br + i) = nidTMP + intervallo - 1;
+                                nidTMP = nidTMP + intervallo;
+                                printf("\t%d)", cont);
+                                printf("\t%d.%d.%d.%d", ipdec[0], k, j, *(nid + i));
+                                printf("\t\t%d.%d.%d.%d", ipdec[0], k, j, *(br + i));
+                                printf("\t%d.%d.%d.%d", ipdec[0], k, j, *(nid + i) + 1);
+                                printf("\t%d.%d.%d.%d", ipdec[0], k, j, *(nid + i) + 2);
+                                printf("\t%d.%d.%d.%d\n", ipdec[0], k, j, *(br + i) - 1);
+                                fprintf(f, "\t%d)\t%d.%d.%d.%d\t%d.%d.%d.%d\t%d.%d.%d.%d\t%d.%d.%d.%d\t%d.%d.%d.%d", cont, ipdec[0], k, j, *(nid + i), ipdec[0], k, j, *(br + i), ipdec[0], k, j, *(nid + i), ipdec[0], k, j, *(nid + i), ipdec[0], k, j, *(br + i));
+                                if (cont == ns)
+                                {
+                                    fclose(f);
+                                    subnet(bit + 8, 1, f);
+                                    return 0;
+                                }
+                                cont++;
                             }
-                            cont++;
                         }
+                        k++;
                     }
-                    k++;
+                }
+                else
+                {
+                    while (k <= ((ns / 256) / pot))
+                    {
+                        for (j = 0; j < 256; j++)
+                        {
+                            nidTMP = 0;
+                            for (i = 0; i < pot; i++)
+                            {
+                                *(nid + i) = nidTMP;
+                                *(br + i) = nidTMP + intervallo - 1;
+                                nidTMP = nidTMP + intervallo;
+                                printf("\t%d)", cont);
+                                printf("\t%d.%d.%d.%d", ipdec[0], k, j, *(nid + i));
+                                printf("\t\t%d.%d.%d.%d", ipdec[0], k, j, *(br + i));
+                                printf("\t%d.%d.%d.%d", ipdec[0], k, j, *(nid + i) + 1);
+                                printf("\t%d.%d.%d.%d", ipdec[0], k, j, *(nid + i) + 2);
+                                printf("\t%d.%d.%d.%d\n", ipdec[0], k, j, *(br + i) - 1);
+                                if (cont == ns)
+                                {
+                                    subnet(bit + 8, 0, f);
+                                    return 0;
+                                }
+                                cont++;
+                            }
+                        }
+                        k++;
+                    }
                 }
                 break;
             case 2:
@@ -428,87 +850,212 @@ int CreaSottoretiA(int ipdec[], int ipbin[], int ns)
                 DC[0] = ipdec[0];
                 k = 0;
                 int y;
-                while (k <= ((ns / 256) / pot))
+                if (sceltaf == 1)
                 {
-                    DC[1] = k;
-                    for (y = 0; y < 256; y++)
+                    while (k <= ((ns / 256) / pot))
                     {
-                        DC[2] = y;
-                        nidTMP = 0;
-                        for (i = 0; i < pot; i++)
+                        DC[1] = k;
+                        for (y = 0; y < 256; y++)
                         {
-                            *(nid + i) = nidTMP;
-                            *(br + i) = nidTMP + intervallo - 1;
-                            nidTMP = nidTMP + intervallo;
+                            DC[2] = y;
+                            nidTMP = 0;
+                            for (i = 0; i < pot; i++)
+                            {
+                                *(nid + i) = nidTMP;
+                                *(br + i) = nidTMP + intervallo - 1;
+                                nidTMP = nidTMP + intervallo;
 
-                            printf("%d) ", cont);
-                            DC[3] = *(nid + i);
-                            decTobin(DC, ipbin);
-                            for (j = 0; j < 32; j++)
-                            {
-                                printf("%d", ipbin[j]);
-                                if (j == 7 || j == 15 || j == 23)
-                                    printf(".");
+                                printf("%d) ", cont);
+                                fprintf(f, " %d)", cont);
+                                DC[3] = *(nid + i);
+                                decTobin(DC, ipbin);
+                                for (j = 0; j < 32; j++)
+                                {
+                                    printf("%d", ipbin[j]);
+                                    fprintf(f, "%d", ipbin[j]);
+                                    if (j == 7 || j == 15 || j == 23)
+                                    {
+                                        printf(".");
+                                        fprintf(f, ".");
+                                    }
+                                }
+                                printf("  ");
+                                fprintf(f, "  ");
+                                DC[3] = *(br + i);
+                                decTobin(DC, ipbin);
+                                for (j = 0; j < 32; j++)
+                                {
+                                    printf("%d", ipbin[j]);
+                                    fprintf(f, "%d", ipbin[j]);
+                                    if (j == 7 || j == 15 || j == 23)
+                                    {
+                                        printf(".");
+                                        fprintf(f, ".");
+                                    }
+                                }
+                                printf("  ");
+                                fprintf(f, "  ");
+                                DC[3] = *(nid + i) + 1;
+                                decTobin(DC, ipbin);
+                                for (j = 0; j < 32; j++)
+                                {
+                                    printf("%d", ipbin[j]);
+                                    fprintf(f, "%d", ipbin[j]);
+                                    if (j == 7 || j == 15 || j == 23)
+                                    {
+                                        printf(".");
+                                        fprintf(f, ".");
+                                    }
+                                }
+                                printf("  ");
+                                fprintf(f, "  ");
+                                DC[3] = *(nid + i) + 2;
+                                decTobin(DC, ipbin);
+                                for (j = 0; j < 32; j++)
+                                {
+                                    printf("%d", ipbin[j]);
+                                    fprintf(f, "%d", ipbin[j]);
+                                    if (j == 7 || j == 15 || j == 23)
+                                    {
+                                        printf(".");
+                                        fprintf(f, ".");
+                                    }
+                                }
+                                printf("  ");
+                                fprintf(f, "  ");
+                                DC[3] = *(br + i) - 1;
+                                decTobin(DC, ipbin);
+                                for (j = 0; j < 32; j++)
+                                {
+                                    printf("%d", ipbin[j]);
+                                    fprintf(f, "%d", ipbin[j]);
+                                    if (j == 7 || j == 15 || j == 23)
+                                    {
+                                        printf(".");
+                                        fprintf(f, ".");
+                                    }
+                                }
+                                fprintf(f, "\n");
+                                printf("\n");
+                                if (cont == ns)
+                                {
+                                    fclose(f);
+                                    subnet(bit + 8, 1, f);
+                                    return 0;
+                                }
+                                cont++;
                             }
-                            printf("  ");
-                            DC[3] = *(br + i);
-                            decTobin(DC, ipbin);
-                            for (j = 0; j < 32; j++)
-                            {
-                                printf("%d", ipbin[j]);
-                                if (j == 7 || j == 15 || j == 23)
-                                    printf(".");
-                            }
-                            printf("  ");
-                            DC[3] = *(nid + i) + 1;
-                            decTobin(DC, ipbin);
-                            for (j = 0; j < 32; j++)
-                            {
-                                printf("%d", ipbin[j]);
-                                if (j == 7 || j == 15 || j == 23)
-                                    printf(".");
-                            }
-                            printf("  ");
-                            DC[3] = *(nid + i) + 2;
-                            decTobin(DC, ipbin);
-                            for (j = 0; j < 32; j++)
-                            {
-                                printf("%d", ipbin[j]);
-                                if (j == 7 || j == 15 || j == 23)
-                                    printf(".");
-                            }
-                            printf("  ");
-                            DC[3] = *(br + i) - 1;
-                            decTobin(DC, ipbin);
-                            for (j = 0; j < 32; j++)
-                            {
-                                printf("%d", ipbin[j]);
-                                if (j == 7 || j == 15 || j == 23)
-                                    printf(".");
-                            }
-                            printf("\n");
-
-                            if (cont == ns)
-                            {
-                                subnet(bit + 8);
-                                return 0;
-                            }
-                            cont++;
                         }
+                        k++;
                     }
-                    k++;
+                }
+                else
+                {
+                    while (k <= ((ns / 256) / pot))
+                    {
+                        DC[1] = k;
+                        for (y = 0; y < 256; y++)
+                        {
+                            DC[2] = y;
+                            nidTMP = 0;
+                            for (i = 0; i < pot; i++)
+                            {
+                                *(nid + i) = nidTMP;
+                                *(br + i) = nidTMP + intervallo - 1;
+                                nidTMP = nidTMP + intervallo;
+
+                                printf("%d) ", cont);
+                                DC[3] = *(nid + i);
+                                decTobin(DC, ipbin);
+                                for (j = 0; j < 32; j++)
+                                {
+                                    printf("%d", ipbin[j]);
+                                    if (j == 7 || j == 15 || j == 23)
+                                        printf(".");
+                                }
+                                printf("  ");
+                                DC[3] = *(br + i);
+                                decTobin(DC, ipbin);
+                                for (j = 0; j < 32; j++)
+                                {
+                                    printf("%d", ipbin[j]);
+                                    if (j == 7 || j == 15 || j == 23)
+                                        printf(".");
+                                }
+                                printf("  ");
+                                DC[3] = *(nid + i) + 1;
+                                decTobin(DC, ipbin);
+                                for (j = 0; j < 32; j++)
+                                {
+                                    printf("%d", ipbin[j]);
+                                    if (j == 7 || j == 15 || j == 23)
+                                        printf(".");
+                                }
+                                printf("  ");
+                                DC[3] = *(nid + i) + 2;
+                                decTobin(DC, ipbin);
+                                for (j = 0; j < 32; j++)
+                                {
+                                    printf("%d", ipbin[j]);
+                                    if (j == 7 || j == 15 || j == 23)
+                                        printf(".");
+                                }
+                                printf("  ");
+                                DC[3] = *(br + i) - 1;
+                                decTobin(DC, ipbin);
+                                for (j = 0; j < 32; j++)
+                                {
+                                    printf("%d", ipbin[j]);
+                                    if (j == 7 || j == 15 || j == 23)
+                                        printf(".");
+                                }
+                                printf("\n");
+
+                                if (cont == ns)
+                                {
+                                    subnet(bit + 8, 0, f);
+                                    return 0;
+                                }
+                                cont++;
+                            }
+                        }
+                        k++;
+                    }
                 }
             }
         }
     }
 }
-int CreaSottoretiB(int ipdec[], int ipbin[], int ns)
+int CreaSottoretiB(int ipdec[], int ipbin[], int ns, FILE *f)
 {
     int *br, *nid;
     int pot = 0, i = 0, j = 0, cont = 0, ott3, k;
     int nidTMP = 0;
     int intervallo;
     int DC[4];
+    int scelta, sceltaf;
+    printf("Vuoi salvare i risultati su file?\n0=no 1=si`");
+    sceltaf = inputscelta(1, 0);
+    if (sceltaf == 1)
+    {
+        if (errore(f) == 0)
+        {
+            f = fopen("SottoretiMFissa.txt", "w");
+            printf("\nFile aperto in scrittura\n");
+        }
+        else
+        {
+            f = fopen("SottoretiMFissa.txt", "a");
+            printf("\nFile già esistente, scrittura in coda\n");
+        }
+
+        time_t t = time(NULL);
+        struct tm tm = *localtime(&t);
+        fprintf(f, "Classe c %d sottoreti\n", ns);
+        fprintf(f, "Sottoreti create in data: \n%d-%02d-%02d orario: %02d:%02d:%02d\n", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour + 1, tm.tm_min, tm.tm_sec);
+    }
+    else
+        printf("Non salverò su file.");
     while (ns >= pow(2, i))
     {
         i++;
@@ -531,82 +1078,187 @@ int CreaSottoretiB(int ipdec[], int ipbin[], int ns)
         }
         printf("\n\t\t\t\t**Sottoreti create**\nOra scelgi come visualizzarle\n");
         printf("1) Decimale\n2) Binario");
-        int scelta;
+
         scanf("%d", &scelta);
         switch (scelta)
         {
         case 1:
             printf("\n\tRETE\tNET ID\t\tBROADCAST\t\tGATEWAY\t\tPRIMO HOST\tULTIMO HOST\n");
-            for (i = 0; i < ns; i++)
+            if (sceltaf == 1)
             {
-                printf("\t%d)", i + 1);
-                printf("\t%d.%d.%d.0", ipdec[0], ipdec[1], *(nid + i));
-                printf("\t%d.%d.%d.255", ipdec[0], ipdec[1], *(br + i));
-                printf("\t%d.%d.%d.1", ipdec[0], ipdec[1], *(nid + i));
-                printf("\t%d.%d.%d.2", ipdec[0], ipdec[1], *(nid + i));
-                printf("\t%d.%d.%d.254\n", ipdec[0], ipdec[1], *(br + i));
+                for (i = 0; i < ns; i++)
+                {
+                    printf("\t%d)", i + 1);
+                    printf("\t%d.%d.%d.0", ipdec[0], ipdec[1], *(nid + i));
+                    printf("\t%d.%d.%d.255", ipdec[0], ipdec[1], *(br + i));
+                    printf("\t%d.%d.%d.1", ipdec[0], ipdec[1], *(nid + i));
+                    printf("\t%d.%d.%d.2", ipdec[0], ipdec[1], *(nid + i));
+                    printf("\t%d.%d.%d.254\n", ipdec[0], ipdec[1], *(br + i));
+                }
+                fclose(f);
+                subnet(pot + 16, 1, f);
             }
-            subnet(pot + 16);
+            else
+            {
+                for (i = 0; i < ns; i++)
+                {
+                    printf("\t%d)", i + 1);
+                    printf("\t%d.%d.%d.0", ipdec[0], ipdec[1], *(nid + i));
+                    printf("\t%d.%d.%d.255", ipdec[0], ipdec[1], *(br + i));
+                    printf("\t%d.%d.%d.1", ipdec[0], ipdec[1], *(nid + i));
+                    printf("\t%d.%d.%d.2", ipdec[0], ipdec[1], *(nid + i));
+                    printf("\t%d.%d.%d.254\n", ipdec[0], ipdec[1], *(br + i));
+                }
+            }
+            subnet(pot + 16, 0, f);
             break;
         case 2:
             printf("\nRETE\t\t\tNET ID\t\t\tBROADCAST\t\t\t\tGATEWAY\t\t\t\tPRIMO HOST\t\t\t\tULTIMO HOST\n");
             DC[0] = ipdec[0];
             DC[1] = ipdec[1];
-            for (i = 0; i < ns; i++)
+            if (sceltaf == 1)
             {
-                printf("%d) ", i + 1);
-                DC[2] = *(nid + i);
-                DC[3] = 0;
-                decTobin(DC, ipbin);
-                for (j = 0; j < 32; j++)
+                for (i = 0; i < ns; i++)
                 {
-                    printf("%d", ipbin[j]);
-                    if (j == 7 || j == 15 || j == 23)
-                        printf(".");
+                    printf("%d) ", i + 1);
+                    fprintf(f, "%d) ", i + 1);
+                    DC[2] = *(nid + i);
+                    DC[3] = 0;
+                    decTobin(DC, ipbin);
+                    for (j = 0; j < 32; j++)
+                    {
+                        printf("%d", ipbin[j]);
+                        fprintf(f, "%d", ipbin[j]);
+                        if (j == 7 || j == 15 || j == 23)
+                        {
+                            printf(".");
+                            fprintf(f, ".");
+                        }
+                    }
+                    printf("  ");
+                    fprintf(f, "  ");
+                    DC[2] = *(br + i);
+                    DC[3] = 255;
+                    decTobin(DC, ipbin);
+                    for (j = 0; j < 32; j++)
+                    {
+                        printf("%d", ipbin[j]);
+                        fprintf(f, "%d", ipbin[j]);
+                        if (j == 7 || j == 15 || j == 23)
+                        {
+                            printf(".");
+                            fprintf(f, ".");
+                        }
+                    }
+                    printf("  ");
+                    fprintf(f, "  ");
+                    DC[2] = *(nid + i);
+                    DC[3] = 1;
+                    decTobin(DC, ipbin);
+                    for (j = 0; j < 32; j++)
+                    {
+                        printf("%d", ipbin[j]);
+                        fprintf(f, "%d", ipbin[j]);
+                        if (j == 7 || j == 15 || j == 23)
+                        {
+                            printf(".");
+                            fprintf(f, ".");
+                        }
+                    }
+                    printf("  ");
+                    fprintf(f, "  ");
+                    DC[2] = *(nid + i);
+                    DC[3] = 2;
+                    decTobin(DC, ipbin);
+                    for (j = 0; j < 32; j++)
+                    {
+                        printf("%d", ipbin[j]);
+                        fprintf(f, "%d", ipbin[j]);
+                        if (j == 7 || j == 15 || j == 23)
+                        {
+                            printf(".");
+                            fprintf(f, ".");
+                        }
+                    }
+                    printf("  ");
+                    fprintf(f, "  ");
+                    DC[2] = *(br + i);
+                    DC[3] = 254;
+                    decTobin(DC, ipbin);
+                    for (j = 0; j < 32; j++)
+                    {
+                        printf("%d", ipbin[j]);
+                        fprintf(f, "%d", ipbin[j]);
+                        if (j == 7 || j == 15 || j == 23)
+                        {
+                            printf(".");
+                            fprintf(f, ".");
+                        }
+                    }
+                    fprintf(f, "\n");
+                    printf("\n");
                 }
-                printf("  ");
-                DC[2] = *(br + i);
-                DC[3] = 255;
-                decTobin(DC, ipbin);
-                for (j = 0; j < 32; j++)
-                {
-                    printf("%d", ipbin[j]);
-                    if (j == 7 || j == 15 || j == 23)
-                        printf(".");
-                }
-                printf("  ");
-                DC[2] = *(nid + i);
-                DC[3] = 1;
-                decTobin(DC, ipbin);
-                for (j = 0; j < 32; j++)
-                {
-                    printf("%d", ipbin[j]);
-                    if (j == 7 || j == 15 || j == 23)
-                        printf(".");
-                }
-                printf("  ");
-                DC[2] = *(nid + i);
-                DC[3] = 2;
-                decTobin(DC, ipbin);
-                for (j = 0; j < 32; j++)
-                {
-                    printf("%d", ipbin[j]);
-                    if (j == 7 || j == 15 || j == 23)
-                        printf(".");
-                }
-                printf("  ");
-                DC[2] = *(br + i);
-                DC[3] = 254;
-                decTobin(DC, ipbin);
-                for (j = 0; j < 32; j++)
-                {
-                    printf("%d", ipbin[j]);
-                    if (j == 7 || j == 15 || j == 23)
-                        printf(".");
-                }
-                printf("\n");
+                fclose(f);
+                subnet(pot + 16, 1, f);
             }
-            subnet(pot + 16);
+            else
+            {
+                for (i = 0; i < ns; i++)
+                {
+                    printf("%d) ", i + 1);
+                    DC[2] = *(nid + i);
+                    DC[3] = 0;
+                    decTobin(DC, ipbin);
+                    for (j = 0; j < 32; j++)
+                    {
+                        printf("%d", ipbin[j]);
+                        if (j == 7 || j == 15 || j == 23)
+                            printf(".");
+                    }
+                    printf("  ");
+                    DC[2] = *(br + i);
+                    DC[3] = 255;
+                    decTobin(DC, ipbin);
+                    for (j = 0; j < 32; j++)
+                    {
+                        printf("%d", ipbin[j]);
+                        if (j == 7 || j == 15 || j == 23)
+                            printf(".");
+                    }
+                    printf("  ");
+                    DC[2] = *(nid + i);
+                    DC[3] = 1;
+                    decTobin(DC, ipbin);
+                    for (j = 0; j < 32; j++)
+                    {
+                        printf("%d", ipbin[j]);
+                        if (j == 7 || j == 15 || j == 23)
+                            printf(".");
+                    }
+                    printf("  ");
+                    DC[2] = *(nid + i);
+                    DC[3] = 2;
+                    decTobin(DC, ipbin);
+                    for (j = 0; j < 32; j++)
+                    {
+                        printf("%d", ipbin[j]);
+                        if (j == 7 || j == 15 || j == 23)
+                            printf(".");
+                    }
+                    printf("  ");
+                    DC[2] = *(br + i);
+                    DC[3] = 254;
+                    decTobin(DC, ipbin);
+                    for (j = 0; j < 32; j++)
+                    {
+                        printf("%d", ipbin[j]);
+                        if (j == 7 || j == 15 || j == 23)
+                            printf(".");
+                    }
+                    printf("\n");
+                }
+                subnet(pot + 16, 0, f);
+            }
             break;
         }
     }
@@ -618,16 +1270,6 @@ int CreaSottoretiB(int ipdec[], int ipbin[], int ns)
         br = (int *)malloc(dim);
         nid = (int *)malloc(dim);
         intervallo = 256 / pot;
-        for (j = 0; j < ns / pot; j++)
-        {
-            nidTMP = 0;
-            for (i = 0; i < pot; i++)
-            {
-                *(nid + i) = nidTMP;
-                *(br + i) = nidTMP + intervallo - 1;
-                nidTMP = nidTMP + intervallo;
-            }
-        }
         printf("\n\t\t\t\t**Sottoreti create**\nOra scelgi come visualizzarle\n");
         printf("1) Decimale\n2) Binario");
         int scelta;
@@ -636,21 +1278,55 @@ int CreaSottoretiB(int ipdec[], int ipbin[], int ns)
         {
         case 1:
             printf("\tRETE\tNET ID\t\tBROADCAST\t\tGATEWAY\t\tPRIMO HOST\tULTIMO HOST\n");
-            for (j = 0; j < ns / pot; j++)
+            if (sceltaf == 1)
             {
-                for (i = 0; i < pot; i++)
+                for (j = 0; j < ns / pot; j++)
                 {
-                    cont++;
-                    printf("\t%d)", cont);
-                    printf("\t%d.%d.%d.%d", ipdec[0], ipdec[1], j, *(nid + i));
-                    printf("\t%d.%d.%d.%d", ipdec[0], ipdec[1], j, *(br + i));
-                    printf("\t%d.%d.%d.%d", ipdec[0], ipdec[1], j, *(nid + i) + 1);
-                    printf("\t%d.%d.%d.%d", ipdec[0], ipdec[1], j, *(nid + i) + 2);
-                    printf("\t%d.%d.%d.%d\n", ipdec[0], ipdec[1], j, *(br + i) - 1);
-                    if (cont == ns)
+                    nidTMP = 0;
+                    for (i = 0; i < pot; i++)
                     {
-                        subnet(pot + 16);
-                        return 0;
+                        *(nid + i) = nidTMP;
+                        *(br + i) = nidTMP + intervallo - 1;
+                        nidTMP = nidTMP + intervallo;
+                        cont++;
+                        printf("\t%d)", cont);
+                        printf("\t%d.%d.%d.%d", ipdec[0], ipdec[1], j, *(nid + i));
+                        printf("\t%d.%d.%d.%d", ipdec[0], ipdec[1], j, *(br + i));
+                        printf("\t%d.%d.%d.%d", ipdec[0], ipdec[1], j, *(nid + i) + 1);
+                        printf("\t%d.%d.%d.%d", ipdec[0], ipdec[1], j, *(nid + i) + 2);
+                        printf("\t%d.%d.%d.%d\n", ipdec[0], ipdec[1], j, *(br + i) - 1);
+                        fprintf(f, "\t%d\t%d.%d.%d.%d\t%d.%d.%d.%d\t%d.%d.%d.%d\t%d.%d.%d.%d\t%d.%d.%d.%d\n", cont, ipdec[0], ipdec[1], j, *(nid + i), ipdec[0], ipdec[1], j, *(br + i), ipdec[0], ipdec[1], j, *(nid + i), ipdec[0], ipdec[1], j, *(nid + i), ipdec[0], ipdec[1], j, *(br + i));
+                        if (cont == ns)
+                        {
+                            fclose(f);
+                            subnet(pot + 16, 1, f);
+                            return 0;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                for (j = 0; j < ns / pot; j++)
+                {
+                    nidTMP = 0;
+                    for (i = 0; i < pot; i++)
+                    {
+                        *(nid + i) = nidTMP;
+                        *(br + i) = nidTMP + intervallo - 1;
+                        nidTMP = nidTMP + intervallo;
+                        cont++;
+                        printf("\t%d)", cont);
+                        printf("\t%d.%d.%d.%d", ipdec[0], ipdec[1], j, *(nid + i));
+                        printf("\t%d.%d.%d.%d", ipdec[0], ipdec[1], j, *(br + i));
+                        printf("\t%d.%d.%d.%d", ipdec[0], ipdec[1], j, *(nid + i) + 1);
+                        printf("\t%d.%d.%d.%d", ipdec[0], ipdec[1], j, *(nid + i) + 2);
+                        printf("\t%d.%d.%d.%d\n", ipdec[0], ipdec[1], j, *(br + i) - 1);
+                        if (cont == ns)
+                        {
+                            subnet(pot + 16, 0, f);
+                            return 0;
+                        }
                     }
                 }
             }
@@ -660,70 +1336,170 @@ int CreaSottoretiB(int ipdec[], int ipbin[], int ns)
             DC[0] = ipdec[0];
             DC[1] = ipdec[1];
             cont = 0;
-            for (k = 0; k < ns / pot; k++)
+            if (sceltaf == 1)
             {
-                DC[2] = k;
-                for (i = 0; i < pot; i++)
+                for (k = 0; k < ns / pot; k++)
                 {
-                    cont++;
-                    printf("\t%d)", cont);
-                    DC[3] = *(nid + i);
-                    decTobin(DC, ipbin);
-                    for (j = 0; j < 32; j++)
+                    DC[2] = k;
+                    nidTMP = 0;
+                    for (i = 0; i < pot; i++)
                     {
-                        printf("%d", ipbin[j]);
-                        if (j == 7 || j == 15 || j == 23)
-                            printf(".");
+                        *(nid + i) = nidTMP;
+                        *(br + i) = nidTMP + intervallo - 1;
+                        nidTMP = nidTMP + intervallo;
+                        cont++;
+                        printf("\t%d)", cont);
+                        fprintf(f, "\t%d", cont);
+                        DC[3] = *(nid + i);
+                        decTobin(DC, ipbin);
+                        for (j = 0; j < 32; j++)
+                        {
+                            printf("%d", ipbin[j]);
+                            fprintf(f, "%d", ipbin[j]);
+                            if (j == 7 || j == 15 || j == 23)
+                            {
+                                printf(".");
+                                fprintf(f, ".");
+                            }
+                        }
+                        printf("  ");
+                        fprintf(f, "  ");
+                        DC[3] = *(br + i);
+                        decTobin(DC, ipbin);
+                        for (j = 0; j < 32; j++)
+                        {
+                            printf("%d", ipbin[j]);
+                            fprintf(f, "%d", ipbin[j]);
+                            if (j == 7 || j == 15 || j == 23)
+                            {
+                                printf(".");
+                                fprintf(f, ".");
+                            }
+                        }
+                        printf("  ");
+                        fprintf(f, "  ");
+                        DC[3] = *(nid + i) + 1;
+                        decTobin(DC, ipbin);
+                        for (j = 0; j < 32; j++)
+                        {
+                            printf("%d", ipbin[j]);
+                            fprintf(f, "%d", ipbin[j]);
+                            if (j == 7 || j == 15 || j == 23)
+                            {
+                                printf(".");
+                                fprintf(f, ".");
+                            }
+                        }
+                        printf("  ");
+                        fprintf(f, "  ");
+                        DC[3] = *(nid + i) + 2;
+                        decTobin(DC, ipbin);
+                        for (j = 0; j < 32; j++)
+                        {
+                            printf("%d", ipbin[j]);
+                            fprintf(f, "%d", ipbin[j]);
+                            if (j == 7 || j == 15 || j == 23)
+                            {
+                                printf(".");
+                                fprintf(f, ".");
+                            }
+                        }
+                        printf("  ");
+                        fprintf(f, "  ");
+                        DC[3] = *(br + 1) - 1;
+                        decTobin(DC, ipbin);
+                        for (j = 0; j < 32; j++)
+                        {
+                            printf("%d", ipbin[j]);
+                            fprintf(f, "%d", ipbin[j]);
+                            if (j == 7 || j == 15 || j == 23)
+                            {
+                                printf(".");
+                                fprintf(f, ".");
+                            }
+                        }
+                        if (cont == ns)
+                        {
+                            fclose(f);
+                            subnet(pot + 16, 1, f);
+                            return 0;
+                        }
+                        printf("\n");
+                        fprintf(f, "\n");
                     }
-                    printf("  ");
-                    DC[3] = *(br + i);
-                    decTobin(DC, ipbin);
-                    for (j = 0; j < 32; j++)
+                }
+            }
+            else
+            {
+                for (k = 0; k < ns / pot; k++)
+                {
+                    DC[2] = k;
+                    nidTMP = 0;
+                    for (i = 0; i < pot; i++)
                     {
-                        printf("%d", ipbin[j]);
-                        if (j == 7 || j == 15 || j == 23)
-                            printf(".");
+                        *(nid + i) = nidTMP;
+                        *(br + i) = nidTMP + intervallo - 1;
+                        nidTMP = nidTMP + intervallo;
+                        cont++;
+                        printf("\t%d)", cont);
+                        DC[3] = *(nid + i);
+                        decTobin(DC, ipbin);
+                        for (j = 0; j < 32; j++)
+                        {
+                            printf("%d", ipbin[j]);
+                            if (j == 7 || j == 15 || j == 23)
+                                printf(".");
+                        }
+                        printf("  ");
+                        DC[3] = *(br + i);
+                        decTobin(DC, ipbin);
+                        for (j = 0; j < 32; j++)
+                        {
+                            printf("%d", ipbin[j]);
+                            if (j == 7 || j == 15 || j == 23)
+                                printf(".");
+                        }
+                        printf("  ");
+                        DC[3] = *(nid + i) + 1;
+                        decTobin(DC, ipbin);
+                        for (j = 0; j < 32; j++)
+                        {
+                            printf("%d", ipbin[j]);
+                            if (j == 7 || j == 15 || j == 23)
+                                printf(".");
+                        }
+                        printf("  ");
+                        DC[3] = *(nid + i) + 2;
+                        decTobin(DC, ipbin);
+                        for (j = 0; j < 32; j++)
+                        {
+                            printf("%d", ipbin[j]);
+                            if (j == 7 || j == 15 || j == 23)
+                                printf(".");
+                        }
+                        printf("  ");
+                        DC[3] = *(br + 1) - 1;
+                        decTobin(DC, ipbin);
+                        for (j = 0; j < 32; j++)
+                        {
+                            printf("%d", ipbin[j]);
+                            if (j == 7 || j == 15 || j == 23)
+                                printf(".");
+                        }
+                        if (cont == ns)
+                        {
+                            subnet(pot + 16, 0, f);
+                            return 0;
+                        }
+                        printf("\n");
                     }
-                    printf("  ");
-                    DC[3] = *(nid + i) + 1;
-                    decTobin(DC, ipbin);
-                    for (j = 0; j < 32; j++)
-                    {
-                        printf("%d", ipbin[j]);
-                        if (j == 7 || j == 15 || j == 23)
-                            printf(".");
-                    }
-                    printf("  ");
-                    DC[3] = *(nid + i) + 2;
-                    decTobin(DC, ipbin);
-                    for (j = 0; j < 32; j++)
-                    {
-                        printf("%d", ipbin[j]);
-                        if (j == 7 || j == 15 || j == 23)
-                            printf(".");
-                    }
-                    printf("  ");
-                    DC[3] = *(br + 1) - 1;
-                    decTobin(DC, ipbin);
-                    for (j = 0; j < 32; j++)
-                    {
-                        printf("%d", ipbin[j]);
-                        if (j == 7 || j == 15 || j == 23)
-                            printf(".");
-                    }
-                    if (cont == ns)
-                    {
-                        subnet(pot + 16);
-                        return 0;
-                    }
-                    printf("\n");
                 }
             }
             break;
         }
     }
 }
-void subnet(int bit)
+void subnet(int bit, int sceltaf, FILE *f)
 {
     int sm[32], smD[4];
     int i;
@@ -737,9 +1513,24 @@ void subnet(int bit)
     converti(sm, smD);
     printf("\n");
     for (i = 0; i < 3; i++)
-    {
         printf("%d.", smD[i]);
-    }
     printf("%d", smD[3]);
     printf("\nSubnet mask CIDR = /%d", bit);
+    if (sceltaf == 1)
+    {
+        if (errore(f) == 1)
+        {
+            f = fopen("SottoretiMFissa.txt", "a");
+            fprintf(f, "\n");
+            for (i = 0; i < 3; i++)
+                fprintf(f, "%d.", smD[i]);
+            fprintf(f, "%d", smD[3]);
+            fprintf(f, "\nSubnet mask CIDR = /%d", bit);
+            fclose(f);
+        }
+        else
+        {
+            printf("Errore nella scrittura della subnet nel file");
+        }
+    }
 }
