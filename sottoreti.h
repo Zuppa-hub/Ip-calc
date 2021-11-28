@@ -266,7 +266,6 @@ int CreaSottoretiA(int ipdec[], int ipbin[], int ns)
             ott3 = bit - 8;
             pot = pow(2, ott3);
             intervallo = 256 / pot;
-            ;
             for (j = 0; j < ns / pot; j++)
             {
                 nidTMP = 0;
@@ -380,35 +379,25 @@ int CreaSottoretiA(int ipdec[], int ipbin[], int ns)
             pot = pow(2, ott2);
             intervallo = 256 / pot;
             k = 0;
-
-            while (k <= ((ns / 256) / pot))
-            {
-                for (j = 0; j < 256; j++)
-                {
-                    nidTMP = 0;
-                    for (i = 0; i < pot; i++)
-                    {
-                        *(nid + i) = nidTMP;
-                        *(br + i) = nidTMP + intervallo - 1;
-                        nidTMP = nidTMP + intervallo;
-                        cont++;
-                    }
-                }
-                k++;
-            }
-            printf("\n\t\t\t\t**Sottoreti create**\nOra scelgi come visualizzarle\n");
+            printf("\nOra scelgi come visualizzarle\n");
             printf("1) Decimale\n2) Binario");
             int scelta;
             scanf("%d", &scelta);
             switch (scelta)
             {
+            case 1:
+                cont = 0;
                 printf("\n\tRETE\tNET ID\t\tBROADCAST\t\tGATEWAY\t\tPRIMO HOST\tULTIMO HOST\n");
                 while (k <= ((ns / 256) / pot))
                 {
                     for (j = 0; j < 256; j++)
                     {
+                        nidTMP = 0;
                         for (i = 0; i < pot; i++)
                         {
+                            *(nid + i) = nidTMP;
+                            *(br + i) = nidTMP + intervallo - 1;
+                            nidTMP = nidTMP + intervallo;
                             printf("\t%d)", cont);
                             printf("\t%d.%d.%d.%d", ipdec[0], k, j, *(nid + i));
                             printf("\t\t%d.%d.%d.%d", ipdec[0], k, j, *(br + i));
@@ -428,6 +417,7 @@ int CreaSottoretiA(int ipdec[], int ipbin[], int ns)
                 break;
             case 2:
                 printf("\nRETE\t\t\tNET ID\t\t\tBROADCAST\t\t\t\tGATEWAY\t\t\t\tPRIMO HOST\t\t\t\tULTIMO HOST\n");
+                cont = 0;
                 DC[0] = ipdec[0];
                 while (k <= ((ns / 256) / pot))
                 {
@@ -435,8 +425,12 @@ int CreaSottoretiA(int ipdec[], int ipbin[], int ns)
                     for (j = 0; j < 256; j++)
                     {
                         DC[2] = j;
+                        nidTMP = 0;
                         for (i = 0; i < pot; i++)
                         {
+                            *(nid + i) = nidTMP;
+                            *(br + i) = nidTMP + intervallo - 1;
+                            nidTMP = nidTMP + intervallo;
                             printf("\t%d)", cont);
                             DC[3] = *(nid + i);
                             decTobin(DC, ipbin);
@@ -504,7 +498,7 @@ int CreaSottoretiB(int ipdec[], int ipbin[], int ns)
     long dim = ns * sizeof(int);
     br = (int *)malloc(dim);
     nid = (int *)malloc(dim);
-    int pot = 0, i = 0, j = 0, cont = 0, ott3;
+    int pot = 0, i = 0, j = 0, cont = 0, ott3, k;
     int nidTMP = 0;
     int intervallo;
     int DC[4];
@@ -518,7 +512,7 @@ int CreaSottoretiB(int ipdec[], int ipbin[], int ns)
         pot = pow(2, i);
         intervallo = 256 / pot;
         nidTMP = 0;
-        printf("\n\tRETE\tNET ID\t\tBROADCAST\t\tGATEWAY\t\tPRIMO HOST\tULTIMO HOST\n");
+
         for (i = 0; i < ns; i++)
         {
             *(nid + i) = nidTMP;
@@ -532,6 +526,7 @@ int CreaSottoretiB(int ipdec[], int ipbin[], int ns)
         switch (scelta)
         {
         case 1:
+            printf("\n\tRETE\tNET ID\t\tBROADCAST\t\tGATEWAY\t\tPRIMO HOST\tULTIMO HOST\n");
             for (i = 0; i < ns; i++)
             {
                 printf("\t%d)", i + 1);
@@ -544,10 +539,12 @@ int CreaSottoretiB(int ipdec[], int ipbin[], int ns)
             subnet(pot + 16);
             break;
         case 2:
+            printf("\nRETE\t\t\tNET ID\t\t\tBROADCAST\t\t\t\tGATEWAY\t\t\t\tPRIMO HOST\t\t\t\tULTIMO HOST\n");
             DC[0] = ipdec[0];
             DC[1] = ipdec[1];
             for (i = 0; i < ns; i++)
             {
+                printf("%d) ", i + 1);
                 DC[2] = *(nid + i);
                 DC[3] = 0;
                 decTobin(DC, ipbin);
@@ -608,7 +605,7 @@ int CreaSottoretiB(int ipdec[], int ipbin[], int ns)
         ott3 = pot - 8;
         pot = pow(2, ott3);
         intervallo = 256 / pot;
-        printf("\tRETE\tNET ID\t\tBROADCAST\t\tGATEWAY\t\tPRIMO HOST\tULTIMO HOST\n");
+
         for (j = 0; j < ns / pot; j++)
         {
             nidTMP = 0;
@@ -626,6 +623,7 @@ int CreaSottoretiB(int ipdec[], int ipbin[], int ns)
         switch (scelta)
         {
         case 1:
+            printf("\tRETE\tNET ID\t\tBROADCAST\t\tGATEWAY\t\tPRIMO HOST\tULTIMO HOST\n");
             for (j = 0; j < ns / pot; j++)
             {
                 for (i = 0; i < pot; i++)
@@ -646,13 +644,17 @@ int CreaSottoretiB(int ipdec[], int ipbin[], int ns)
             }
             break;
         case 2:
+            printf("\nRETE\t\t\tNET ID\t\t\tBROADCAST\t\t\t\tGATEWAY\t\t\t\tPRIMO HOST\t\t\t\tULTIMO HOST\n");
             DC[0] = ipdec[0];
             DC[1] = ipdec[1];
-            for (j = 0; j < ns / pot; j++)
+            cont = 0;
+            for (k = 0; k < ns / pot; k++)
             {
-                DC[2] = j;
+                DC[2] = k;
                 for (i = 0; i < pot; i++)
                 {
+                    cont++;
+                    printf("\t%d)", cont);
                     DC[3] = *(nid + i);
                     decTobin(DC, ipbin);
                     for (j = 0; j < 32; j++)
@@ -690,6 +692,19 @@ int CreaSottoretiB(int ipdec[], int ipbin[], int ns)
                     }
                     printf("  ");
                     DC[3] = *(br + 1) - 1;
+                    decTobin(DC, ipbin);
+                    for (j = 0; j < 32; j++)
+                    {
+                        printf("%d", ipbin[j]);
+                        if (j == 7 || j == 15 || j == 23)
+                            printf(".");
+                    }
+                    if (cont == ns)
+                    {
+                        subnet(pot + 16);
+                        return 0;
+                    }
+                    printf("\n");
                 }
             }
             break;
@@ -706,7 +721,7 @@ void subnet(int bit)
     {
         sm[i] = 1;
     }
-    printf("Subnet mask in decimale = ");
+    printf("\nSubnet mask in decimale = ");
     converti(sm, smD);
     printf("\n");
     for (i = 0; i < 3; i++)
