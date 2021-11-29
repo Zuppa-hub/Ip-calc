@@ -7,7 +7,7 @@
 * ✔️ Output sottoreti in binario o decimale che
 ### Da aggiungere:
 * ❌ Maschera variabile
-## In fase di test 
+### In fase di test:
 * 🕐 salvataggio su file
 ## Istruzioni per la compilazione
 #### Windows:
