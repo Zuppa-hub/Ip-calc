@@ -62,10 +62,16 @@ void CreaSottoretiC(int ipdec[], int ipbin[], int ns, FILE *f)
     //decTobin(ipdec,ipbin);
     //massimo 64
     int *br, *nid;
-    long dim = ns * sizeof(int);
+    int pot = 0, i = 0, j;
+    while (ns >= pow(2, i))
+        i++;
+    int BitRete = i;
+    pot = pow(2, i);
+    pot = 256 / pot;
+    long dim = pot * sizeof(int);
     br = (int *)malloc(dim);
     nid = (int *)malloc(dim);
-    int pot = 0, i = 0, j;
+
     int nidTMP = 0, brTMP = 0;
     int DC[4];
     int scelta, sceltaf;
@@ -76,6 +82,7 @@ void CreaSottoretiC(int ipdec[], int ipbin[], int ns, FILE *f)
         if (errore(f) == 0)
         {
             f = fopen("SottoretiMFissa.txt", "w");
+            fprintf(f, "Andrea Cazzato 4INA");
             printf("\nFile aperto in scrittura\n");
         }
         else
@@ -87,16 +94,11 @@ void CreaSottoretiC(int ipdec[], int ipbin[], int ns, FILE *f)
         time_t t = time(NULL);
         struct tm tm = *localtime(&t);
         fprintf(f, "Classe c %d sottoreti\n", ns);
-        fprintf(f, "Sottoreti create in data: \n%d-%02d-%02d orario: %02d:%02d:%02d\n", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour + 1, tm.tm_min, tm.tm_sec);
+        fprintf(f, "Sottoreti create in data: %d-%02d-%02d orario: %02d:%02d:%02d\n", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour + 1, tm.tm_min, tm.tm_sec);
     }
     else
         printf("Non salverò su file.");
 
-    while (ns >= pow(2, i))
-        i++;
-    int BitRete = i;
-    pot = pow(2, i);
-    pot = 256 / pot;
     for (int i = 0; i < ns; i++)
     {
         *(nid + i) = nidTMP;
@@ -292,6 +294,7 @@ int CreaSottoretiA(int ipdec[], int ipbin[], int ns, FILE *f)
         if (errore(f) == 0)
         {
             f = fopen("SottoretiMFissa.txt", "w");
+            fprintf(f, "Andrea Cazzato 4INA");
             printf("\nFile aperto in scrittura\n");
         }
         else
@@ -302,7 +305,7 @@ int CreaSottoretiA(int ipdec[], int ipbin[], int ns, FILE *f)
 
         time_t t = time(NULL);
         struct tm tm = *localtime(&t);
-        fprintf(f, "Classe c %d sottoreti\n", ns);
+        fprintf(f, "Classe A %d sottoreti\n", ns);
         fprintf(f, "Sottoreti create in data: \n%d-%02d-%02d orario: %02d:%02d:%02d\n", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour + 1, tm.tm_min, tm.tm_sec);
     }
     else
@@ -338,6 +341,7 @@ int CreaSottoretiA(int ipdec[], int ipbin[], int ns, FILE *f)
             printf("\n\tRETE\tNET ID\t\tBROADCAST\t\tGATEWAY\t\tPRIMO HOST\tULTIMO HOST\n");
             if (sceltaf == 1)
             {
+                fprintf(f, "\n\tRETE\tNET ID\t\tBROADCAST\t\tGATEWAY\t\tPRIMO HOST\tULTIMO HOST\n");
                 for (i = 0; i < ns; i++)
                 {
                     printf("\t%d) ", i + 1);
@@ -370,6 +374,7 @@ int CreaSottoretiA(int ipdec[], int ipbin[], int ns, FILE *f)
             DC[0] = ipdec[0];
             if (sceltaf == 1)
             {
+                fprintf(f, "\nRETE\t\t\tNET ID\t\t\tBROADCAST\t\t\t\tGATEWAY\t\t\t\tPRIMO HOST\t\t\t\tULTIMO HOST\n");
                 for (i = 0; i < ns; i++)
                 {
                     printf("%d) ", i + 1);
@@ -543,6 +548,7 @@ int CreaSottoretiA(int ipdec[], int ipbin[], int ns, FILE *f)
                 printf("\n\tRETE\tNET ID\t\tBROADCAST\t\tGATEWAY\t\tPRIMO HOST\tULTIMO HOST\n");
                 if (sceltaf == 1)
                 {
+                    fprintf(f, "\n\tRETE\tNET ID\t\tBROADCAST\t\tGATEWAY\t\tPRIMO HOST\tULTIMO HOST\n");
                     for (j = 0; j < ns / pot; j++)
                     {
                         nidTMP = 0;
@@ -596,6 +602,7 @@ int CreaSottoretiA(int ipdec[], int ipbin[], int ns, FILE *f)
                 DC[0] = ipdec[0];
                 if (sceltaf == 1)
                 {
+                    fprintf(f, "\nRETE\t\t\tNET ID\t\t\tBROADCAST\t\t\t\tGATEWAY\t\t\t\tPRIMO HOST\t\t\t\tULTIMO HOST\n");
                     for (j = 0; j < ns / pot; j++)
                     {
                         DC[1] = j;
@@ -785,6 +792,7 @@ int CreaSottoretiA(int ipdec[], int ipbin[], int ns, FILE *f)
                 printf("\n\tRETE\tNET ID\t\tBROADCAST\t\tGATEWAY\t\tPRIMO HOST\tULTIMO HOST\n");
                 if (sceltaf == 1)
                 {
+                    fprintf(f, "\n\tRETE\tNET ID\t\tBROADCAST\t\tGATEWAY\t\tPRIMO HOST\tULTIMO HOST\n");
                     while (k <= ((ns / 256) / pot))
                     {
                         for (j = 0; j < 256; j++)
@@ -801,7 +809,7 @@ int CreaSottoretiA(int ipdec[], int ipbin[], int ns, FILE *f)
                                 printf("\t%d.%d.%d.%d", ipdec[0], k, j, *(nid + i) + 1);
                                 printf("\t%d.%d.%d.%d", ipdec[0], k, j, *(nid + i) + 2);
                                 printf("\t%d.%d.%d.%d\n", ipdec[0], k, j, *(br + i) - 1);
-                                fprintf(f, "\t%d)\t%d.%d.%d.%d\t%d.%d.%d.%d\t%d.%d.%d.%d\t%d.%d.%d.%d\t%d.%d.%d.%d", cont, ipdec[0], k, j, *(nid + i), ipdec[0], k, j, *(br + i), ipdec[0], k, j, *(nid + i), ipdec[0], k, j, *(nid + i), ipdec[0], k, j, *(br + i));
+                                fprintf(f, "\t%d)\t%d.%d.%d.%d\t%d.%d.%d.%d\t%d.%d.%d.%d\t%d.%d.%d.%d\t%d.%d.%d.%d\n", cont, ipdec[0], k, j, *(nid + i), ipdec[0], k, j, *(br + i), ipdec[0], k, j, *(nid + i) + 1, ipdec[0], k, j, *(nid + i) + 2, ipdec[0], k, j, *(br + i) - 1);
                                 if (cont == ns)
                                 {
                                     fclose(f);
@@ -852,6 +860,7 @@ int CreaSottoretiA(int ipdec[], int ipbin[], int ns, FILE *f)
                 int y;
                 if (sceltaf == 1)
                 {
+                    fprintf(f, "\nRETE\t\t\tNET ID\t\t\tBROADCAST\t\t\t\tGATEWAY\t\t\t\tPRIMO HOST\t\t\t\tULTIMO HOST\n");
                     while (k <= ((ns / 256) / pot))
                     {
                         DC[1] = k;
@@ -1041,6 +1050,7 @@ int CreaSottoretiB(int ipdec[], int ipbin[], int ns, FILE *f)
         if (errore(f) == 0)
         {
             f = fopen("SottoretiMFissa.txt", "w");
+            fprintf(f, "Andrea Cazzato 4INA");
             printf("\nFile aperto in scrittura\n");
         }
         else
@@ -1051,7 +1061,7 @@ int CreaSottoretiB(int ipdec[], int ipbin[], int ns, FILE *f)
 
         time_t t = time(NULL);
         struct tm tm = *localtime(&t);
-        fprintf(f, "Classe c %d sottoreti\n", ns);
+        fprintf(f, "Classe B %d sottoreti\n", ns);
         fprintf(f, "Sottoreti create in data: \n%d-%02d-%02d orario: %02d:%02d:%02d\n", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour + 1, tm.tm_min, tm.tm_sec);
     }
     else
@@ -1086,6 +1096,7 @@ int CreaSottoretiB(int ipdec[], int ipbin[], int ns, FILE *f)
             printf("\n\tRETE\tNET ID\t\tBROADCAST\t\tGATEWAY\t\tPRIMO HOST\tULTIMO HOST\n");
             if (sceltaf == 1)
             {
+                fprintf(f, "\n\tRETE\tNET ID\t\tBROADCAST\t\tGATEWAY\t\tPRIMO HOST\tULTIMO HOST\n");
                 for (i = 0; i < ns; i++)
                 {
                     printf("\t%d)", i + 1);
@@ -1094,6 +1105,7 @@ int CreaSottoretiB(int ipdec[], int ipbin[], int ns, FILE *f)
                     printf("\t%d.%d.%d.1", ipdec[0], ipdec[1], *(nid + i));
                     printf("\t%d.%d.%d.2", ipdec[0], ipdec[1], *(nid + i));
                     printf("\t%d.%d.%d.254\n", ipdec[0], ipdec[1], *(br + i));
+                    fprintf(f, "\t%d)\t%d.%d.%d.0\t%d.%d.%d.255\t%d.%d.%d.1\t%d.%d.%d.2\t%d.%d.%d.254", i + 1, ipdec[0], ipdec[1], *(nid + i), ipdec[0], ipdec[1], *(br + i), ipdec[0], ipdec[1], *(nid + i), ipdec[0], ipdec[1], *(nid + i), ipdec[0], ipdec[1], *(br + i));
                 }
                 fclose(f);
                 subnet(pot + 16, 1, f);
@@ -1118,6 +1130,7 @@ int CreaSottoretiB(int ipdec[], int ipbin[], int ns, FILE *f)
             DC[1] = ipdec[1];
             if (sceltaf == 1)
             {
+                fprintf(f, "\nRETE\t\t\tNET ID\t\t\tBROADCAST\t\t\t\tGATEWAY\t\t\t\tPRIMO HOST\t\t\t\tULTIMO HOST\n");
                 for (i = 0; i < ns; i++)
                 {
                     printf("%d) ", i + 1);
@@ -1280,6 +1293,7 @@ int CreaSottoretiB(int ipdec[], int ipbin[], int ns, FILE *f)
             printf("\tRETE\tNET ID\t\tBROADCAST\t\tGATEWAY\t\tPRIMO HOST\tULTIMO HOST\n");
             if (sceltaf == 1)
             {
+                fprintf(f, "\tRETE\tNET ID\t\tBROADCAST\t\tGATEWAY\t\tPRIMO HOST\tULTIMO HOST\n");
                 for (j = 0; j < ns / pot; j++)
                 {
                     nidTMP = 0;
@@ -1338,6 +1352,7 @@ int CreaSottoretiB(int ipdec[], int ipbin[], int ns, FILE *f)
             cont = 0;
             if (sceltaf == 1)
             {
+                fprintf(f, "\nRETE\t\t\tNET ID\t\t\tBROADCAST\t\t\t\tGATEWAY\t\t\t\tPRIMO HOST\t\t\t\tULTIMO HOST\n");
                 for (k = 0; k < ns / pot; k++)
                 {
                     DC[2] = k;
@@ -1349,7 +1364,7 @@ int CreaSottoretiB(int ipdec[], int ipbin[], int ns, FILE *f)
                         nidTMP = nidTMP + intervallo;
                         cont++;
                         printf("\t%d)", cont);
-                        fprintf(f, "\t%d", cont);
+                        fprintf(f, "\t%d) ", cont);
                         DC[3] = *(nid + i);
                         decTobin(DC, ipbin);
                         for (j = 0; j < 32; j++)
