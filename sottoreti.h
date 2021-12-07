@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
-#include "DecToBin.h"
 
 int CreaSottoretiA(int ipdec[], int ipbin[], int ns, FILE *f);
 int CreaSottoretiB(int ipdec[], int ipbin[], int ns, FILE *f);

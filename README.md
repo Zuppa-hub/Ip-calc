@@ -5,10 +5,9 @@
 * ✔️ Input indirizzi e subnet sia in decimale che in binario.
 * ✔️ Calcolo sottoreti per ogni classe
 * ✔️ Output sottoreti in binario o decimale che
-### Da aggiungere:
-* ❌ Maschera variabile
 ### In fase di test:
 * 🕐 salvataggio su file
+* 🕐 Maschera variabile
 ## Istruzioni per la compilazione
 #### Windows:
 Programmi necessari: MinGW 64bit

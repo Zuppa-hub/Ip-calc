@@ -24,6 +24,18 @@ int errore(FILE *fp) //funzione per verificvare se un file esiste oppure no
         fclose(fp);
     return 1;
 }
+int erroreVar(FILE *fp) //funzione per verificvare se un file esiste oppure no
+{
+    if (fopen("SottoretiVLSM.txt", "r") == NULL)
+    {
+        printf("\nFile vuoto o non esistente");
+        fclose(fp);
+        return 0;
+    }
+    else
+        fclose(fp);
+    return 1;
+}
 void stampa(int *ipbin, FILE *f, int flag)
 {
     int i, j;
