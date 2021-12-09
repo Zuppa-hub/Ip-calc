@@ -62,7 +62,7 @@ void CreaSottoretiC(int ipdec[], int ipbin[], int ns, FILE *f)
     //massimo 64
     int *br, *nid;
     int pot = 0, i = 0, j;
-    while (ns >= pow(2, i))
+    while (ns > pow(2, i))
         i++;
     int BitRete = i;
     pot = pow(2, i);
@@ -92,7 +92,7 @@ void CreaSottoretiC(int ipdec[], int ipbin[], int ns, FILE *f)
         time_t t = time(NULL);
         struct tm tm = *localtime(&t);
         fprintf(f, "Classe c %d sottoreti\n", ns);
-        fprintf(f, "Sottoreti create in data: %d-%02d-%02d orario: %02d:%02d:%02d\n", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour + 1, tm.tm_min, tm.tm_sec);
+        fprintf(f, "Sottoreti create in data: %d-%02d-%02d orario: %02d:%02d:%02d\n", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour , tm.tm_min, tm.tm_sec);
     }
     else
         printf("Non salverò su file.");
