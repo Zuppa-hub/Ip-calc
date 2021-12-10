@@ -118,7 +118,7 @@ void VariabileClasseC(int ipdec[], int ipbin[], int ns, FILE *f)
             time_t t = time(NULL);
             struct tm tm = *localtime(&t);
             fprintf(f, "Classe C %d sottoreti a maschera variabile \n", ns);
-            fprintf(f, "Sottoreti create in data: \n%d-%02d-%02d orario: %02d:%02d:%02d\n", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour + 1, tm.tm_min, tm.tm_sec);
+            fprintf(f, "Sottoreti create in data: %d-%02d-%02d orario: %02d:%02d:%02d\n", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour + 1, tm.tm_min, tm.tm_sec);
         }
         else
             printf("Non salverò su file.");
@@ -203,88 +203,221 @@ void VariabileClasseB(int ipdec[], int ipbin[], int ns, FILE *f)
     broad = (int *)malloc(dim);
     nHost = (int *)malloc(dim);
     int i, j, k;
-    int tmp;
-    int bithost, bitrete;
-    int potenza, intervallo[2];
+    int tmp=0, somma = 0, sceltaf=-1, scelta=-1;
+    int bithost=0, bitrete=0;
+    int potenza, intervallo[2] = {0, 0};
     int inter3ott = 0;
     int inter4ott = 0;
-
+    int Hdisp=0;
+    int DC[4]={0, 0, 0, 0};
     for (i = 0; i < ns; i++)
     {
-        printf("Inserisci il numero di Host per la %d sottorete", i + 1);
-        scanf("%d", &tmp);
-        tmp = tmp + 3;
-        *(host + i) = tmp;
-    }
-    for (i = 0; i < ns; i++)
-    {
-        for (j = i + 1; j < ns; j++)
+        for (i = 0; i < ns; i++)
         {
-            if (*(host + j) > *(host + i))
-            {
-                tmp = *(host + i);
-                *(host + i) = *(host + j);
-                *(host + j) = tmp;
-            }
+            printf("Inserisci il numero di Host per la %d sottorete", i + 1);
+            scanf("%d", &tmp);
+            tmp = tmp + 3;
+            *(host + i) = tmp;
+            somma = somma + *(host + i);
         }
     }
-    for (i = 0; i < ns; i++)
+    if (somma > 65536)
+        printf("Impossibile calcolare le sottoreti, troppi host per la classe B");
+    else
     {
-        j = 0;
-        while (*(host + i) > pow(2, j))
-            j++;
-        *(pot + i) = j;
-    }
-    for (i = 0; i < ns; i++)
-        printf("\nPotenza per l' host %d = %d", *(host + i), *(pot + i));
-    printf("\n\tRETE\tNET ID\t\tBROADCAST\tGATEWAY\t\tPRIMO HOST\tULTIMO HOST\tNUMERO HOST");
-    //calcolo
-    for (k = 0; k < ns; k++)
-    {
-        if (*(pot + k) >= 8)
+        for (i = 0; i < ns; i++)
         {
-            bitrete = 16 - *(pot + k);
-            potenza = pow(2, bitrete);
-            intervallo[0] = 256 / potenza;
-
-            *(netID + k) = inter3ott;
-            *(broad + k) = inter3ott + intervallo[0] - 1;
-
-            *(nHost + k) = ((*(broad + k) + 1 - *(netID + k)) * 256) - 2; //Nel caso net[k] sia 0, diventerebbe -1 e invece di sottrarre sommerebbe. Perciò aumento il broadcast.
-            if (*(nHost + k) == -2)
+            for (j = i + 1; j < ns; j++)
             {
-                *(nHost + k) = 253;
+                if (*(host + j) > *(host + i))
+                {
+                    tmp = *(host + i);
+                    *(host + i) = *(host + j);
+                    *(host + j) = tmp;
+                }
             }
-            printf("\t%d)", k + 1);
-            printf("\t%d.%d.%d.0", ipdec[0], ipdec[1], *(netID + k));
-            printf("\t%d.%d.%d.255", ipdec[0], ipdec[1], *(broad + k));
-            printf("\t%d.%d.%d.1", ipdec[0], ipdec[1], *(netID + k));
-            printf("\t%d.%d.%d.2", ipdec[0], ipdec[1], *(netID + k));
-            printf("\t%d.%d.%d.254\n", ipdec[0], ipdec[1], *(broad + k));
+        }
+        for (i = 0; i < ns; i++)
+        {
+            j = 0;
+            while (*(host + i) > pow(2, j))
+                j++;
+            *(pot + i) = j;
+        }
+        printf("Vuoi salvare i risultati su file?\n0=no 1=si`");
+        sceltaf = inputscelta(1, 0);
+        if (sceltaf == 1)
+        {
+            if (erroreVar(f) == 0)
+            {
+                f = fopen("SottoretiVLSM.txt", "w");
+                fprintf(f, "Andrea Cazzato 4INA");
+                printf("\nFile aperto in scrittura\n");
+            }
+            else
+            {
+                f = fopen("SottoretiVLSM.txt", "a");
+                printf("\nFile già esistente, scrittura in coda\n");
+            }
+
+            time_t t = time(NULL);
+            struct tm tm = *localtime(&t);
+            fprintf(f, "Classe B %d sottoreti a maschera variabile \n", ns);
+            fprintf(f, "Sottoreti create in data: %d-%02d-%02d orario: %02d:%02d:%02d\n", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour + 1, tm.tm_min, tm.tm_sec);
+        }
+        else
+            printf("Non salverò su file.");
+        printf("\nOra scelgi come visualizzarle\n");
+        printf("1) Decimale\n2) Binario");
+        scanf("%d", &scelta);
+        for (i = 0; i < ns; i++)
+        {
+            for (j = i + 1; j < ns; j++)
+            {
+                if (*(host + j) > *(host + i))
+                {
+                    tmp = *(host + i);
+                    *(host + i) = *(host + j);
+                    *(host + j) = tmp;
+                }
+            }
+        }
+        for (i = 0; i < ns; i++)
+        {
+            j = 0;
+            while (*(host + i) > pow(2, j))
+                j++;
+            *(pot + i) = j;
+        }
+        for (i = 0; i < ns; i++)
+            printf("\nPotenza per l' host %d = %d", *(host + i), *(pot + i));
+        if (scelta == 1)
+        {
+            printf("\n\tRETE\tNET ID\t\tBROADCAST\tGATEWAY\t\tPRIMO HOST\tULTIMO HOST\tNUMERO HOST\n");
+            if (sceltaf == 1)
+                fprintf(f, "\n\tRETE\tNET ID\t\tBROADCAST\tGATEWAY\t\tPRIMO HOST\tULTIMO HOST\tNUMERO HOST\n");
         }
         else
         {
-            intervallo[0] = 0;
-            bitrete = 8 - *(pot + k);
-            potenza = pow(2, bitrete);
-            intervallo[1] = 256 / potenza;
-
-            *(netID + k) = inter4ott;
-            *(broad + k) = inter4ott + intervallo[1] - 1;
-
-            printf("\t%d)", k + 1);
-            printf("\t%d.%d.%d.%d", ipdec[0], ipdec[1], inter3ott, *(netID + k));
-            printf("\t%d.%d.%d.%d", ipdec[0], ipdec[1], inter3ott, *(broad + k));
-            printf("\t%d.%d.%d.%d", ipdec[0], ipdec[1], inter3ott, *(netID + k) + 1);
-            printf("\t%d.%d.%d.%d", ipdec[0], ipdec[1], *(netID + k) + 2);
-            printf("\t%d.%d.%d.%d\n", ipdec[0], ipdec[1], *(broad + k) - 1);
-            printf("   %d\n", *(broad + k) - *(netID + k) - 2);
-            inter4ott = inter4ott + intervallo[1];
+            printf("\nRETE\t\t\tNET ID\t\t\tBROADCAST\t\t\t\tGATEWAY\t\t\t\tPRIMO HOST\t\t\t\tULTIMO HOST\n");
+            if (sceltaf == 1)
+                fprintf(f, "\nRETE\t\t\tNET ID\t\t\tBROADCAST\t\t\t\tGATEWAY\t\t\t\tPRIMO HOST\t\t\t\tULTIMO HOST\n");
         }
-        inter3ott = inter3ott + intervallo[0];
+        //calcolo
+        DC[0] = ipdec[0];
+        DC[1] = ipdec[1];
+        for (k = 0; k < ns; k++)
+        {
+            if (*(pot + k) >= 8)
+            {
+                inter3ott = inter3ott + intervallo[0];
+                bitrete = 16 - *(pot + k);
+                potenza = pow(2, bitrete);
+                intervallo[0] = 256 / potenza;
+
+                *(netID + k) = inter3ott;
+                *(broad + k) = inter3ott + intervallo[0] - 1;
+
+                *(nHost + k) = ((*(broad + k) + 1 - *(netID + k)) * 256) - 2; //Nel caso net[k] sia 0, diventerebbe -1 e invece di sottrarre sommerebbe. Perciò aumento il broadcast.
+                if (*(nHost + k) == -2)
+                    *(nHost + k) = 253;
+                if (scelta == 1)
+                {
+                    printf("\t%d)\t%d.%d.%d.0\t%d.%d.%d.255\t%d.%d.%d.1\t%d.%d.%d.2\t%d.%d.%d.254\t", k + 1, ipdec[0], ipdec[1], *(netID + k), ipdec[0], ipdec[1], *(broad + k), ipdec[0], ipdec[1], *(netID + k), ipdec[0], ipdec[1], *(netID + k), ipdec[0], ipdec[1], *(broad + k));
+                    printf("%d\n", (intervallo[0] * 256) - 3); //host disponibili per ogni sottorete
+                    if (sceltaf == 1)
+                    {
+                        fprintf(f, "\t%d)\t%d.%d.%d.0\t%d.%d.%d.255\t%d.%d.%d.1\t%d.%d.%d.2\t%d.%d.%d.254\t", k + 1, ipdec[0], ipdec[1], *(netID + k), ipdec[0], ipdec[1], *(broad + k), ipdec[0], ipdec[1], *(netID + k), ipdec[0], ipdec[1], *(netID + k), ipdec[0], ipdec[1], *(broad + k));
+                        fprintf(f, "%d\n", (intervallo[0] * 256) - 3);
+                    }
+                }
+                else
+                {
+                    printf("\t%d)", k + 1);
+                    if (sceltaf == 1)
+                        fprintf(f, "%d) ", i + 1);
+                    DC[2] = *(netID + k);
+                    DC[3] = 0;
+                    decTobin(DC, ipbin);
+                    stampa(ipbin, f, sceltaf);
+                    DC[2] = *(broad + k);
+                    DC[3] = 255;
+                    decTobin(DC, ipbin);
+                    stampa(ipbin, f, sceltaf);
+                    DC[2] = *(netID + k);
+                    DC[3] = 1;
+                    decTobin(DC, ipbin);
+                    stampa(ipbin, f, sceltaf);
+                    DC[2] = *(netID + k);
+                    DC[3] = 2;
+                    decTobin(DC, ipbin);
+                    stampa(ipbin, f, sceltaf);
+                    DC[2] = *(broad + k);
+                    DC[3] = 254;
+                    decTobin(DC, ipbin);
+                    stampa(ipbin, f, sceltaf);
+                    if (sceltaf == 1)
+                        fprintf(f, "\n");
+                    printf("\n");
+                }
+            }
+            else
+            {
+                inter3ott = inter3ott + intervallo[0];
+                intervallo[0] = 0;
+                bitrete = 8 - *(pot + k);
+                potenza = pow(2, bitrete);
+                intervallo[1] = 256 / potenza;
+
+                *(netID + k) = inter4ott;
+                *(broad + k) = inter4ott + intervallo[1] - 1;
+                if (scelta == 1)
+                {
+                    printf("\n\t%d)\t%d.%d.%d.%d\t%d.%d.%d.%d\t%d.%d.%d.%d\t%d.%d.%d.%d\t%d.%d.%d.%d\t%d", k + 1, ipdec[0], ipdec[1], inter3ott, *(netID + k), ipdec[0], ipdec[1], inter3ott, *(broad + k), ipdec[0], ipdec[1], inter3ott, *(netID + k) + 1, ipdec[0], ipdec[1], inter3ott, *(netID + k) + 2, ipdec[0], ipdec[1], inter3ott, *(broad + k) - 1, *(broad + k) - *(netID + k) - 2);
+                    if (sceltaf == 1)
+                        fprintf(f, "\n\t%d)\t%d.%d.%d.%d\t%d.%d.%d.%d\t%d.%d.%d.%d\t%d.%d.%d.%d\t%d.%d.%d.%d\t%d", k + 1, ipdec[0], ipdec[1], inter3ott, *(netID + k), ipdec[0], ipdec[1], inter3ott, *(broad + k), ipdec[0], ipdec[1], inter3ott, *(netID + k) + 1, ipdec[0], ipdec[1], inter3ott, *(netID + k) + 2, ipdec[0], ipdec[1], inter3ott, *(broad + k) - 1, *(broad + k) - *(netID + k) - 2);
+                }
+                else
+                {
+                    printf("\t%d)", k + 1);
+                    if (sceltaf == 1)
+                        fprintf(f, "%d) ", i + 1);
+                    DC[2] = inter3ott;
+                    DC[3] = *(netID + k);
+                    decTobin(DC, ipbin);
+                    stampa(ipbin, f, sceltaf);
+                    DC[2] = inter3ott;
+                    DC[3] = *(broad + k);
+                    decTobin(DC, ipbin);
+                    stampa(ipbin, f, sceltaf);
+                    DC[2] = inter3ott;
+                    DC[3] = *(netID + k) + 1;
+                    decTobin(DC, ipbin);
+                    stampa(ipbin, f, sceltaf);
+                    DC[2] = inter3ott;
+                    DC[3] = *(netID + k) + 2;
+                    decTobin(DC, ipbin);
+                    stampa(ipbin, f, sceltaf);
+                    DC[2] = inter3ott;
+                    DC[3] = *(broad + k) - 1;
+                    decTobin(DC, ipbin);
+                    stampa(ipbin, f, sceltaf);
+                    if (sceltaf == 1)
+                        fprintf(f, "\n");
+                    printf("\n");
+                }
+                inter4ott = inter4ott + intervallo[1];
+            }
+            if (inter4ott > 255)
+            {
+                inter4ott = 0;
+                inter3ott++;
+            }
+        }
+        if (sceltaf == 1)
+            fclose(f);
     }
 }
-
 void m_varA(int dec[], int sottoreti, int host[])
 {
     int i = 0, k, cont = 0;
