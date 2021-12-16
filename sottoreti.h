@@ -92,7 +92,7 @@ void CreaSottoretiC(int ipdec[], int ipbin[], int ns, FILE *f)
         time_t t = time(NULL);
         struct tm tm = *localtime(&t);
         fprintf(f, "Classe c %d sottoreti\n", ns);
-        fprintf(f, "Sottoreti create in data: %d-%02d-%02d orario: %02d:%02d:%02d\n", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour , tm.tm_min, tm.tm_sec);
+        fprintf(f, "Sottoreti create in data: %d-%02d-%02d orario: %02d:%02d:%02d\n", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
     }
     else
         printf("Non salverò su file.");
@@ -163,6 +163,8 @@ void CreaSottoretiC(int ipdec[], int ipbin[], int ns, FILE *f)
             fclose(f);
         break;
     }
+    free(br); //libero l'area di memoria
+    free(nid);
 }
 int CreaSottoretiA(int ipdec[], int ipbin[], int ns, FILE *f)
 {
@@ -496,6 +498,8 @@ int CreaSottoretiA(int ipdec[], int ipbin[], int ns, FILE *f)
             }
         }
     }
+    free(br); //libero l'area di memoria
+    free(nid);
 }
 int CreaSottoretiB(int ipdec[], int ipbin[], int ns, FILE *f)
 {
@@ -708,6 +712,8 @@ int CreaSottoretiB(int ipdec[], int ipbin[], int ns, FILE *f)
             break;
         }
     }
+    free(br); //libero l'area di memoria
+    free(nid);
 }
 void subnet(int bit, int sceltaf, FILE *f)
 {
