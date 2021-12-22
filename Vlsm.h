@@ -57,21 +57,21 @@ void VariabileClasseC(int ipdec[], int ipbin[], int ns, FILE *f)
     int potenza, intervallo, intervalloP = 0;
     int scelta, sceltaf;
     int somma = 0;
-    for (i = 0; i < ns; i++)
+    for (i = 0; i < ns; i++) //prendo il numero host
     {
         printf("Inserisci il numero di Host per la %d sottorete", i + 1);
         scanf("%d", &tmp);
         tmp = tmp + 3;
-        *(host + i) = tmp;
-        somma = somma + *(host + i);
+        *(host + i) = tmp;           //calcolo numero host effettivo sommando 3
+        somma = somma + *(host + i); //sommo tutti gli host per controllare che le sottoreti siano fattibili
     }
-    if (somma > 255)
+    if (somma > 255) //controllo che per la classe c siano fattibili x sottoreti
         printf("Impossibile calcolare le sottoreti, troppi host per la classe C");
     else
     {
-        for (i = 0; i < ns; i++)
+        for (i = 0; i < ns; i++) //ordinamento degli host in modo decrescente
         {
-            for (j = i + 1; j < ns; j++)
+            for (j = i + 1; j < ns; j++) //selection sort semplificato
             {
                 if (*(host + j) > *(host + i))
                 {
@@ -81,7 +81,7 @@ void VariabileClasseC(int ipdec[], int ipbin[], int ns, FILE *f)
                 }
             }
         }
-        for (i = 0; i < ns; i++)
+        for (i = 0; i < ns; i++) //assegno la potenza da utilizzare agli host per ogni sottorete
         {
             j = 0;
             while (*(host + i) > pow(2, j))
@@ -107,7 +107,7 @@ void VariabileClasseC(int ipdec[], int ipbin[], int ns, FILE *f)
             time_t t = time(NULL);
             struct tm tm = *localtime(&t);
             fprintf(f, "Classe C %d sottoreti a maschera variabile \n", ns);
-            fprintf(f, "Sottoreti create in data: %d-%02d-%02d orario: %02d:%02d:%02d\n", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour + 1, tm.tm_min, tm.tm_sec);
+            fprintf(f, "Sottoreti create in data: %d-%02d-%02d orario: %02d:%02d:%02d\n", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour + 1, tm.tm_min, tm.tm_sec); //file
         }
         else
             printf("Non salverò su file.");
@@ -123,26 +123,26 @@ void VariabileClasseC(int ipdec[], int ipbin[], int ns, FILE *f)
             fprintf(f, "\nRETE\t\t\tNET ID\t\t\tBROADCAST\t\t\t\tGATEWAY\t\t\t\tPRIMO HOST\t\t\t\tULTIMO HOST\n");
         for (i = 0; i < ns; i++)
         {
-            bitrete = 8 - *(pot + i);
-            potenza = pow(2, bitrete);
+            bitrete = 8 - *(pot + i);  //calcolo i bit da dare alla rete, agendo su un solo ottetto faccio -8
+            potenza = pow(2, bitrete); //se i bit alla rete sono 2 avremo potenza = 4, l'intervallo per le sottoreti sarà 64
             intervallo = 256 / potenza;
 
-            *(netID + i) = intervalloP;
-            *(broad + i) = intervallo + intervalloP - 1;
+            *(netID + i) = intervalloP;                  //primo = 0
+            *(broad + i) = intervallo + intervalloP - 1; //secondo net -1
             intervalloP = intervallo + intervalloP;
         }
         switch (scelta)
         {
         case 1:
-            printf("\n\tRETE\tNET ID\t\tBROADCAST\tGATEWAY\t\tPRIMO HOST\tULTIMO HOST\tNUMERO HOST\n");
+            printf("\n\tRETE\tNET ID\t\tBROADCAST\tGATEWAY\t\tPRIMO HOST\tULTIMO HOST\tNUMERO HOST\tSUBNET\nn");
             for (k = 0; k < ns; k++)
             {
-                printf("\t%d)\t%d.%d.%d.%d\t%d.%d.%d.%d\t\t%d.%d.%d.%d\t%d.%d.%d.%d\t%d.%d.%d.%d\n", k + 1, ipdec[0], ipdec[1], ipdec[2], *(netID + k), ipdec[0], ipdec[1], ipdec[2], *(broad + k), ipdec[0], ipdec[1], ipdec[2], *(netID + k) + 1, ipdec[0], ipdec[1], ipdec[2], *(netID + k) + 2, ipdec[0], ipdec[1], ipdec[2], *(broad + k) - 1);
+                printf("\t%d)\t%d.%d.%d.%d\t%d.%d.%d.%d\t\t%d.%d.%d.%d\t%d.%d.%d.%d\t%d.%d.%d.%d\t%d\n", k + 1, ipdec[0], ipdec[1], ipdec[2], *(netID + k), ipdec[0], ipdec[1], ipdec[2], *(broad + k), ipdec[0], ipdec[1], ipdec[2], *(netID + k) + 1, ipdec[0], ipdec[1], ipdec[2], *(netID + k) + 2, ipdec[0], ipdec[1], ipdec[2], *(broad + k) - 1, );
                 printf("%d\n", *(broad + k) - *(netID + k) - 2);
                 if (sceltaf == 1)
                 {
                     fprintf(f, "\t%d)\t%d.%d.%d.%d\t%d.%d.%d.%d\t\t%d.%d.%d.%d\t%d.%d.%d.%d\t%d.%d.%d.%d", k + 1, ipdec[0], ipdec[1], ipdec[2], *(netID + k), ipdec[0], ipdec[1], ipdec[2], *(broad + k), ipdec[0], ipdec[1], ipdec[2], *(netID + k) + 1, ipdec[0], ipdec[1], ipdec[2], *(netID + k) + 2, ipdec[0], ipdec[1], ipdec[2], *(broad + k) - 1);
-                    fprintf(f, "\t%d\n", *(broad + k) - *(netID + k) - 2);
+                    fprintf(f, "\t%d\n", *(broad + k) - *(netID + k) - 2); // host per ogni sottorete
                 }
             }
             break;
@@ -180,7 +180,7 @@ void VariabileClasseC(int ipdec[], int ipbin[], int ns, FILE *f)
             fclose(f);
     }
 }
-void VariabileClasseB(int ipdec[], int ipbin[], int ns, FILE *f)
+void VariabileClasseB(int ipdec[], int ipbin[], int ns, FILE *f) // stesso ragionamneto della classe c ma divindendo in due i casi e
 {
     int *host, *pot;
     int *netID, *broad;
@@ -199,6 +199,7 @@ void VariabileClasseB(int ipdec[], int ipbin[], int ns, FILE *f)
     int inter4ott = 0;
     int Hdisp = 0;
     int DC[4] = {0, 0, 0, 0};
+    //come classe c
     for (i = 0; i < ns; i++)
     {
         printf("Inserisci il numero di Host per la %d sottorete", i + 1);
