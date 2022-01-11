@@ -2,85 +2,56 @@
 #include "BintoDEC.h"
 void input(int dec[], int bin[], int flag)
 {
-    int i;
+    int i, j,k;
     if (flag == 0)
     {
-        for (i = 0; i < 4; i++)
+        char decimale[16];
+        char decAppoggio[4];
+        int moltiplica = 100;
+        int m = 1;
+        int somma;
+        fflush(stdin);
+        fgets(decimale, 15, stdin);
+        decimale[strlen(decimale)-1] = 46;
+        i = 0;
+        k=0;
+        for (j = 0; j < 4; j++)
         {
+            somma = 0;
+            while (decimale[i] != 46)
+            {
+                m = m * 10;
+                i++;
+            };
+            m = m / 10;
             do
             {
-                printf("Inserisci la %d cifra dell'indirizzo ip in decimale: ", i + 1);
-                scanf("%d", &dec[i]);
-                if (dec[i] < 0 || dec[i] > 255)
-                {
-                    printf("La cifra %d non è contenuta tra 0 e 255, reinseriscila", dec[i]);
-                }
-
-            } while (dec[i] < 0 || dec[i] > 255);
+                somma = somma + (decimale[k] - 48) * m;
+                m = m / 10;
+                k++;
+            } while (k<i);
+            k++;
+            dec[j]=somma;
+            m=1;
+            i++;
         }
     }
     else
     {
         if (flag == 1)
         {
-            for (i = 0; i < 32; i++)
+            char binario[35];
+            fflush(stdin);
+            fgets(binario,35,stdin);
+            for (j = 0; j < 35; j++)
             {
-                do
-                {
-                    printf("Inserisci la %d cifra dell'indirizzo ip in binario: ", i + 1);
-                    scanf("%d", &bin[i]);
-                    if (bin[i] < 0 || bin[i] > 1)
-                    {
-                        printf("La cifra %d non è binaria, reinseriscila", bin[i]);
-                    }
-                    if (i == 7 || i == 15 || i == 23)
-                    {
-                        printf("\nOttetto inserito\n");
-                    }
-                } while (bin[i] < 0 || bin[i] > 1);
-            }
-            converti(bin, dec);
-        }
-        else
-        {
-            if (flag == 2)
-            {
-                for (i = 0; i < 4; i++)
-                {
-                    do
-                    {
-                        printf("Inserisci la %d cifra della subnet in decimale: ", i + 1);
-                        scanf("%d", &dec[i]);
-                        if (dec[i] < 0 || dec[i] > 255)
-                        {
-                            printf("La cifra %d non è contenuta tra 0 e 255, reinseriscila", dec[i]);
-                        }
-                    } while (dec[i] < 0 || dec[i] > 255);
-                }
-            }
-            else
-            {
-                if (flag == 3)
-                {
-                    for (i = 0; i < 32; i++)
-                    {
-                        do
-                        {
-                            printf("Inserisci la %d cifra della subnet in binario: ", i + 1);
-                            scanf("%d", &bin[i]);
-                            if (bin[i] < 0 || bin[i] > 1)
-                            {
-                                printf("La cifra %d non è contenuta tra 0 e 1, reinseriscila", bin[i]);
-                            }
-                            if (i == 7 || i == 15 || i == 23)
-                            {
-                                printf("\nottetto inserito\n");
-                            }
-                        } while (bin[i] < 0 || bin[i] > 1);
-                    }
-                    converti(bin, dec);
-                }
-            }
+                bin[j] = binario[j] - 48;
+                if (j == 8 || j == 17 || j == 26)
+                    j++;
+            } 
+            converti(bin,dec);
+            free(bin);
         }
     }
+    system("cls");
 }

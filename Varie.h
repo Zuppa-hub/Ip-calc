@@ -17,11 +17,8 @@ int errore(FILE *fp) //funzione per verificvare se un file esiste oppure no
     if (fopen("SottoretiMFissa.txt", "r") == NULL)
     {
         printf("\nFile vuoto o non esistente");
-        fclose(fp);
         return 0;
     }
-    else
-        fclose(fp);
     return 1;
 }
 int erroreVar(FILE *fp) //funzione per verificvare se un file esiste oppure no
