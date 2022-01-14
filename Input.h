@@ -1,8 +1,8 @@
 //#include <stdio.h>
 #include "BintoDEC.h"
-void input(int dec[], int bin[], int flag)
+int input(int dec[], int bin[], int flag)
 {
-    int i, j,k;
+    int i, j, k;
     if (flag == 0)
     {
         char decimale[16];
@@ -12,9 +12,9 @@ void input(int dec[], int bin[], int flag)
         int somma;
         fflush(stdin);
         fgets(decimale, 15, stdin);
-        decimale[strlen(decimale)-1] = 46;
+        decimale[strlen(decimale) - 1] = 46;
         i = 0;
-        k=0;
+        k = 0;
         for (j = 0; j < 4; j++)
         {
             somma = 0;
@@ -29,10 +29,10 @@ void input(int dec[], int bin[], int flag)
                 somma = somma + (decimale[k] - 48) * m;
                 m = m / 10;
                 k++;
-            } while (k<i);
+            } while (k < i);
             k++;
-            dec[j]=somma;
-            m=1;
+            dec[j] = somma;
+            m = 1;
             i++;
         }
     }
@@ -42,16 +42,33 @@ void input(int dec[], int bin[], int flag)
         {
             char binario[35];
             fflush(stdin);
-            fgets(binario,35,stdin);
+            fgets(binario, 35, stdin);
             for (j = 0; j < 35; j++)
             {
                 bin[j] = binario[j] - 48;
                 if (j == 8 || j == 17 || j == 26)
                     j++;
-            } 
-            converti(bin,dec);
+            }
+            converti(bin, dec);
             free(bin);
         }
     }
     system("cls");
+    printf("Controllo che l'indirizzo sia valido\n\n");
+    j = 0;
+    for (i = 0; i < 4; i++)
+        if (dec[i] > 0 && dec[i] < 255)
+            j++;
+    if (j != i)
+    {
+        char passa[1];
+        printf("Indirizzo non valido\nPremere un tasto per continuare");
+        fgets(passa,1,stdin);
+        system("cls");
+        return -1;
+    }
+    printf("Indirizzo valido\n");
+    sleep(1);
+    system("cls");
+    return 0;
 }

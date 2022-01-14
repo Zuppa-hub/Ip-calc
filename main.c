@@ -26,6 +26,7 @@ Tutto il lavoro sugli indirizzi viene svolto in decimale, indirizzi inseriti in 
 #include <math.h>
 #include <time.h>
 #include <string.h>
+#include <unistd.h>
 
 //Header File contenenti le funzioni
 #include "Input.h"
@@ -49,11 +50,14 @@ int main()
     int classe, sottoreti; //classe verrà restituita dalla funzione classe in un numero
     int scelta;            //scelta = variabile per switch
     int inserimentoDB;     // inserimentoDB = flag per il metodo di input. 0 = decimale. 1 = binario
+    int controllo;
+    char passa[1];
     do
     {
+        system("cls");
         fflush(stdout);
         fflush(stdin);
-        printf("\n1) Insisci ip e calcola classe indirizzo privato o pubblico\n2) Calcola se due indirizzi avendo una subnet mask appartengono alla stessa rete\n3) Calcola le sottoreti avendo ip e numero sottoreti\n4) Calcola le sottoreti avendo ip e numero di host\n5)Uscita");
+        printf("\n1) Inserisci ip e calcola classe indirizzo privato o pubblico\n2) Calcola se due indirizzi avendo una subnet mask appartengono alla stessa rete\n3) Calcola le sottoreti avendo ip e numero sottoreti\n4) Calcola le sottoreti avendo ip e numero di host\n5)Uscita");
         scanf("%d", &scelta);
         switch (scelta)
         {
@@ -64,7 +68,9 @@ int main()
                 printf("Esempio indirizzo ip in decimale 192.168.1.1\nInserisci l'indirizzo ip in decimale: ");
             else
                 printf("Esempio indirizzo ip in binario 11000000.10101000.00000001.00000001\nInserisci l'indirizzo ip in binario: ");
-            input(ipDec, ipBin, inserimentoDB); //input, in base al flag inserimentodb inseiriamo in decimnale o binario
+            controllo = input(ipDec, ipBin, inserimentoDB); //input, in base al flag inserimentodb inseiriamo in decimnale o binario
+            if (controllo == -1)
+                break;
             classe = classePrvPb(ipDec);
             break;
         case 2:; //inserendo due indirizzi e una subent mask tramite and bit bit verifichiamo se appartengono alla stessa rete
@@ -74,30 +80,35 @@ int main()
                 printf("Esempio indirizzo ip in decimale 192.168.1.1\nInserisci l'indirizzo ip in decimale: ");
             else
                 printf("Esempio indirizzo ip in binario 11000000.10101000.00000001.00000001\nInserisci il primo indirizzo ip in binario: ");
-            input(ipDec, ipBin, inserimentoDB); //input primo infirizzo
+            controllo = input(ipDec, ipBin, inserimentoDB); //input primo infirizzo
             printf("\n Digita 0 se hai un indirizzo in decimale\n Digita 1 se hai un insirizzo in binario\n");
             inserimentoDB = inputscelta(1, 0);
             if (inserimentoDB == 0)
                 printf("Esempio indirizzo ip in decimale 192.168.1.1\nInserisci l'indirizzo ip in decimale: ");
             else
                 printf("Esempio indirizzo ip in binario 11000000.10101000.00000001.00000001\nInserisci il secondo indirizzo ip in binario: ");
-            input(ipDec2, ipBin2, inserimentoDB); //secondo ind
-
+            controllo = input(ipDec2, ipBin2, inserimentoDB); //secondo ind
+            if (controllo == -1)
+                break;
             printf("\n Digita 0 se hai una subnet in decimale\n Digita 1 se hai una subnet in binario\n");
             inserimentoDB = inputscelta(1, 0);
-            input(smDec, smBin, inserimentoDB); //sm
-            netId(ipDec, smDec, nId1);          //calcolo net id tramite &&
-            netId(ipDec2, smDec, nId2);         //secondo nid
-            stessaRete(nId1, nId2);             //controllo se i net id sono uguali
+            controllo = input(smDec, smBin, inserimentoDB); //sm
+            if (controllo == -1)
+                break;
+            netId(ipDec, smDec, nId1);  //calcolo net id tramite &&
+            netId(ipDec2, smDec, nId2); //secondo nid
+            stessaRete(nId1, nId2);     //controllo se i net id sono uguali
             break;
         case 3:; //creazione sottoreti a maschera fissa, tutti i controlli sono nella funzione CreaSottoreti
             printf("\n Digita 0 se hai un indirizzo ip in decimale\n Digita 1 se hai un insirizzo ip in binario\n");
             inserimentoDB = inputscelta(1, 0);
-           if (inserimentoDB == 0)
+            if (inserimentoDB == 0)
                 printf("Esempio indirizzo ip in decimale 192.168.1.1\nInserisci l'indirizzo ip in decimale: ");
             else
                 printf("Esempio indirizzo ip in binario 11000000.10101000.00000001.00000001\nInserisci l'indirizzo ip in binario: ");
-            input(ipDec, ipBin, inserimentoDB); //input indirizzo
+            controllo = input(ipDec, ipBin, inserimentoDB); //input indirizzo
+            if (controllo == -1)
+                break;
             printf("Digitare il numero di sottoreti");
             scanf("%d", &sottoreti);
             classe = classePrvPb(ipDec);                    //prendiamo la classe dell'indirizzo
@@ -106,7 +117,13 @@ int main()
         case 4:; //creazione sottoreti a maschera variabile, tutti i controlli sono nella funzione CreaSottoretiVLSM e nelle relative sottofunzioni.
             printf("\n Digita 0 se hai un indirizzo ip in decimale\n Digita 1 se hai un insirizzo ip in binario\n");
             inserimentoDB = inputscelta(1, 0);
-            input(ipDec, ipBin, inserimentoDB);
+            if (inserimentoDB == 0)
+                printf("Esempio indirizzo ip in decimale 192.168.1.1\nInserisci l'indirizzo ip in decimale: ");
+            else
+                printf("Esempio indirizzo ip in binario 11000000.10101000.00000001.00000001\nInserisci l'indirizzo ip in binario: ");
+            controllo = input(ipDec, ipBin, inserimentoDB);
+            if (controllo == -1)
+                break;
             printf("Digitare il numero di sottoreti");
             scanf("%d", &sottoreti);
             classe = classePrvPb(ipDec);
@@ -120,5 +137,7 @@ int main()
             printf("\nScelta non valida, riprova");
             break;
         }
+        printf("premere un tasto per tornare al menu' principale");
+        fgets(passa, 1, stdin);
     } while (scelta < 6); // così da effettuare altre operazioni se non si esce dal programma.
 }

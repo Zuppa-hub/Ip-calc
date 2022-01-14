@@ -14,12 +14,10 @@ int inputscelta(int mass, int min)
 }
 int errore(FILE *fp) //funzione per verificvare se un file esiste oppure no
 {
-    if (fopen("SottoretiMFissa.txt", "r") == NULL)
-    {
-        printf("\nFile vuoto o non esistente");
+    if (access("database.dat", F_OK) == 0)
+        return 1;
+    else
         return 0;
-    }
-    return 1;
 }
 int erroreVar(FILE *fp) //funzione per verificvare se un file esiste oppure no
 {
