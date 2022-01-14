@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
-void VariabileClasseC(int ipdec[], int ipbin[], int ns, FILE *f);
+int VariabileClasseC(int ipdec[], int ipbin[], int ns, FILE *f);
 void VariabileClasseB(int ipdec[], int ipbin[], int ns, FILE *f);
 void VariabileClasseA(int ipdec[], int ipbin[], int ns, FILE *f);
 void CreaSottoretiVLSM(int classe, int ipdec[], int ipbin[], int ns)
@@ -10,6 +10,7 @@ void CreaSottoretiVLSM(int classe, int ipdec[], int ipbin[], int ns)
     FILE *f;
     if (classe == 1)
     {
+        printf("\n");
         if (ns >= pow(2, 22) || ns <= 0)
             printf("Impossibile calcolare %d sottoreti con indirizzo %d.%d.%d.%d", ns, ipdec[0], ipdec[1], ipdec[2], ipdec[3]);
         else
@@ -19,6 +20,7 @@ void CreaSottoretiVLSM(int classe, int ipdec[], int ipbin[], int ns)
     {
         if (classe == 2)
         {
+            printf("\n");
             if (ns >= pow(2, 15) || ns < 0)
                 printf("Impossibile calcolare %d sottoreti con indirizzo %d.%d.%d.%d", ns, ipdec[0], ipdec[1], ipdec[2], ipdec[3]);
             else
@@ -28,6 +30,7 @@ void CreaSottoretiVLSM(int classe, int ipdec[], int ipbin[], int ns)
         {
             if (classe == 3)
             {
+                printf("\n");
                 if (ns > pow(2, 7) || ns <= 0)
                     printf("Impossibile calcolare %d sottoreti con indirizzo %d.%d.%d.%d", ns, ipdec[0], ipdec[1], ipdec[2], ipdec[3]);
                 else
@@ -41,15 +44,17 @@ void CreaSottoretiVLSM(int classe, int ipdec[], int ipbin[], int ns)
         printf("%d\n", classe);
     }
 }
-void VariabileClasseC(int ipdec[], int ipbin[], int ns, FILE *f)
+int VariabileClasseC(int ipdec[], int ipbin[], int ns, FILE *f)
 {
     int *host, *pot;
     int *netID, *broad;
+    int *sm;
     long dim = ns * sizeof(int);
     host = (int *)malloc(dim);
     pot = (int *)malloc(dim);
     netID = (int *)malloc(dim);
     broad = (int *)malloc(dim);
+    sm = (int *)malloc(dim);
     int i, j, k;
     int tmp;
     int DC[4];
@@ -120,7 +125,7 @@ void VariabileClasseC(int ipdec[], int ipbin[], int ns, FILE *f)
         if (sceltaf == 1 && scelta == 1)
             fprintf(f, "\n\tRETE\tNET ID\t\tBROADCAST\t\tGATEWAY\t\tPRIMO HOST\tULTIMO HOST\n");
         else if (sceltaf == 1 && scelta == 2)
-            fprintf(f, "\nRETE\t\t\tNET ID\t\t\tBROADCAST\t\t\t\tGATEWAY\t\t\t\tPRIMO HOST\t\t\t\tULTIMO HOST\n");
+            fprintf(f, "\nRETE\t\t\tNET ID\t\t\tBROADCAST\t\t\tGATEWAY\t\t\t\tPRIMO HOST\t\t\t\tULTIMO HOST\n");
         for (i = 0; i < ns; i++)
         {
             bitrete = 8 - *(pot + i);  //calcolo i bit da dare alla rete, agendo su un solo ottetto faccio -8
@@ -129,16 +134,25 @@ void VariabileClasseC(int ipdec[], int ipbin[], int ns, FILE *f)
 
             *(netID + i) = intervalloP;                  //primo = 0
             *(broad + i) = intervallo + intervalloP - 1; //secondo net -1
+            if (*(broad + i) > 255)
+            {
+                printf("Imposibile calcolare le sottoreti, troppi host per la classe C");
+                sleep(3);
+                system("cls");
+                return -1;
+            }
             intervalloP = intervallo + intervalloP;
         }
         switch (scelta)
         {
         case 1:
-            printf("\n\tRETE\tNET ID\t\tBROADCAST\tGATEWAY\t\tPRIMO HOST\tULTIMO HOST\tNUMERO HOST\tSUBNET\nn");
+            printf("\n\tRETE\tNET ID\t\tBROADCAST\tGATEWAY\t\tPRIMO HOST\tULTIMO HOST\tNUMERO HOST\tSUBNET\t\t\t      SUBNET CIDR\n");
             for (k = 0; k < ns; k++)
             {
-                printf("\t%d)\t%d.%d.%d.%d\t%d.%d.%d.%d\t\t%d.%d.%d.%d\t%d.%d.%d.%d\t%d.%d.%d.%d\t%d\n", k + 1, ipdec[0], ipdec[1], ipdec[2], *(netID + k), ipdec[0], ipdec[1], ipdec[2], *(broad + k), ipdec[0], ipdec[1], ipdec[2], *(netID + k) + 1, ipdec[0], ipdec[1], ipdec[2], *(netID + k) + 2, ipdec[0], ipdec[1], ipdec[2], *(broad + k) - 1);
-                printf("%d\n", *(broad + k) - *(netID + k) - 2);
+                printf("\t%d)\t%d.%d.%d.%d\t%d.%d.%d.%d\t%d.%d.%d.%d\t%d.%d.%d.%d\t%d.%d.%d.%d\t", k + 1, ipdec[0], ipdec[1], ipdec[2], *(netID + k), ipdec[0], ipdec[1], ipdec[2], *(broad + k), ipdec[0], ipdec[1], ipdec[2], *(netID + k) + 1, ipdec[0], ipdec[1], ipdec[2], *(netID + k) + 2, ipdec[0], ipdec[1], ipdec[2], *(broad + k) - 1);
+                printf("%d\t\t", *(broad + k) - *(netID + k) - 2);
+                subvar(*(pot + k)+24,sceltaf,f);
+                printf("\t\t/%d\n", *(pot + k) + 24);
                 if (sceltaf == 1)
                 {
                     fprintf(f, "\t%d)\t%d.%d.%d.%d\t%d.%d.%d.%d\t\t%d.%d.%d.%d\t%d.%d.%d.%d\t%d.%d.%d.%d", k + 1, ipdec[0], ipdec[1], ipdec[2], *(netID + k), ipdec[0], ipdec[1], ipdec[2], *(broad + k), ipdec[0], ipdec[1], ipdec[2], *(netID + k) + 1, ipdec[0], ipdec[1], ipdec[2], *(netID + k) + 2, ipdec[0], ipdec[1], ipdec[2], *(broad + k) - 1);

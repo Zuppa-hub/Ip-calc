@@ -7,7 +7,7 @@
 int CreaSottoretiA(int ipdec[], int ipbin[], int ns, FILE *f);
 int CreaSottoretiB(int ipdec[], int ipbin[], int ns, FILE *f);
 void CreaSottoretiC(int ipdec[], int ipbin[], int ns, FILE *f);
-void subnet(int bit, int sceltaf, FILE *f);
+//void subnet(int bit, int sceltaf, FILE *f);
 
 void CreaSottoreti(int classe, int ipdec[], int ipbin[], int ns)
 {
@@ -53,7 +53,7 @@ void CreaSottoreti(int classe, int ipdec[], int ipbin[], int ns)
     }
     if (classe != 1 && classe != 2 && classe != 3)
     {
-        printf("\nErrore\n");
+        printf("\nErrore, l'indirizzo non appartiene alle classi A, B o C.\n");
         printf("%d\n", classe);
     }
 }
@@ -78,6 +78,7 @@ void CreaSottoretiC(int ipdec[], int ipbin[], int ns, FILE *f)
     sceltaf = inputscelta(1, 0);
     if (sceltaf == 1)
     {
+        printf("\n\n e = %d\n\n",errore(f));
         if (errore(f) == 0)
         {
             f = fopen("SottoretiMFissa.txt", "w");
@@ -158,10 +159,10 @@ void CreaSottoretiC(int ipdec[], int ipbin[], int ns, FILE *f)
                 fprintf(f, "\n");
             printf("\n");
         }
-        subnet(BitRete + 24, sceltaf, f);
-        printf("\nNumero host per ogni sottorete = %d", pot - 3);
         if (sceltaf == 1)
             fclose(f);
+        subnet(BitRete + 24, sceltaf, f);
+        printf("\nNumero host per ogni sottorete = %d", pot - 3);
         break;
     }
     free(br); //libero l'area di memoria
@@ -716,7 +717,7 @@ int CreaSottoretiB(int ipdec[], int ipbin[], int ns, FILE *f)
     free(br); //libero l'area di memoria
     free(nid);
 }
-void subnet(int bit, int sceltaf, FILE *f)
+/* void subnet(int bit, int sceltaf, FILE *f)
 {
     int sm[32], smD[4];
     int i;
@@ -751,3 +752,4 @@ void subnet(int bit, int sceltaf, FILE *f)
         }
     }
 }
+ */

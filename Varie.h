@@ -14,22 +14,17 @@ int inputscelta(int mass, int min)
 }
 int errore(FILE *fp) //funzione per verificvare se un file esiste oppure no
 {
-    if (access("database.dat", F_OK) == 0)
+    if (access("SottoretiMFissa.txt", F_OK) == 0)
         return 1;
     else
         return 0;
 }
 int erroreVar(FILE *fp) //funzione per verificvare se un file esiste oppure no
 {
-    if (fopen("SottoretiVLSM.txt", "r") == NULL)
-    {
-        printf("\nFile vuoto o non esistente");
-        fclose(fp);
-        return 0;
-    }
+    if (access("SottoretiVLSM.txt", F_OK) == 0)
+        return 1;
     else
-        fclose(fp);
-    return 1;
+        return 0;
 }
 void stampa(int *ipbin, FILE *f, int flag)
 {

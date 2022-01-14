@@ -1,7 +1,7 @@
 //#include <stdio.h>
 int classePrvPb(int ipdec[])
 {
-    printf("L'indirizzo %d.%d.%d.%d e' di \n", ipdec[0], ipdec[1], ipdec[2], ipdec[3]);
+    printf("L'indirizzo %d.%d.%d.%d e' di ", ipdec[0], ipdec[1], ipdec[2], ipdec[3]);
     if (ipdec[0] >= 0 && ipdec[0] <= 127)
     {
         printf("classe A ed e' un ");
@@ -15,7 +15,7 @@ int classePrvPb(int ipdec[])
     {
         if (ipdec[0] >= 128 && ipdec[0] <= 191)
         {
-            printf("classe B ed e' ");
+            printf("classe B ed e' un ");
             if (ipdec[0] == 172 && ipdec[1] >= 16 && ipdec[1] <= 31)
                 printf("indirizzo privato");
             else
@@ -26,7 +26,7 @@ int classePrvPb(int ipdec[])
         {
             if (ipdec[0] >= 192 && ipdec[0] <= 223)
             {
-                printf("classe C ed e' ");
+                printf("classe C ed e' un ");
                 if (ipdec[0] == 192 && ipdec[1] == 168)
                     printf("indirizzo privato");
                 else

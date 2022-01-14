@@ -34,8 +34,10 @@ Tutto il lavoro sugli indirizzi viene svolto in decimale, indirizzi inseriti in 
 #include "DecToBin.h"
 #include "stessaRete.h"
 #include "Varie.h"
+#include "Subnet.h"
 #include "sottoreti.h"
 #include "Vlsm.h"
+
 //Costanti
 #define maxbin 32 //cifre binarie
 #define maxdec 12 //cifre decimali
@@ -137,7 +139,9 @@ int main()
             printf("\nScelta non valida, riprova");
             break;
         }
-        printf("premere un tasto per tornare al menu' principale");
-        fgets(passa, 1, stdin);
+        printf("\n\npremere un tasto per tornare al menu' principale\n");
+        fflush(stdin);
+        fflush(stdout);
+        scanf("%c",&passa[0]);
     } while (scelta < 6); // così da effettuare altre operazioni se non si esce dal programma.
 }

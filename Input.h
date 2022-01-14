@@ -57,7 +57,7 @@ int input(int dec[], int bin[], int flag)
     printf("Controllo che l'indirizzo sia valido\n\n");
     j = 0;
     for (i = 0; i < 4; i++)
-        if (dec[i] > 0 && dec[i] < 255)
+        if (dec[i] >= 0 && dec[i] <= 255)
             j++;
     if (j != i)
     {
