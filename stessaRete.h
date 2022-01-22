@@ -4,7 +4,7 @@ void netId(int ip[], int sm[], int nID[])
 {
     int i;
     for (i = 0; i < 4; i++)
-        nID[i] = ip[i] & sm[i]; 
+        nID[i] = ip[i] & sm[i];         //and bit bit 
 }
 int stessaRete(int nID[], int nID2[])
 {

@@ -1,16 +1,20 @@
 #include <stdio.h>
-int inputscelta(int mass, int min)
+int inputscelta(int mass, int min)//invece di scrivere ad ogni input un controllo questa funzione passadno il valore minimo e massimo lo restituisce appena viene insierito valido
 {
-    int scelta;
+    char scelta[1];
+    int sceltaI;
     do
     {
-        scanf("%d", &scelta);
-        if (scelta > mass || scelta < min)
+        fflush(stdin);
+        scanf("%c",&scelta[0]);     //per evitare che vengano inserite lettere e blochino il programma con una variabile int
+        sceltaI = scelta[0] - 48;   //converto la stringa in intero 
+        //printf("%d\n", sceltaI);
+        if (sceltaI > mass || sceltaI < min)
         {
-            printf("\nScelta non valida\n");
+            printf("\nScelta non valida, riprova\n");
         }
-    } while (scelta < min || scelta > mass);
-    return scelta;
+    } while (sceltaI < min || sceltaI > mass);
+    return sceltaI;
 }
 int errore(FILE *fp) //funzione per verificvare se un file esiste oppure no
 {
@@ -26,10 +30,10 @@ int erroreVar(FILE *fp) //funzione per verificvare se un file esiste oppure no
     else
         return 0;
 }
-void stampa(int *ipbin, FILE *f, int flag)
+void stampa(int *ipbin, FILE *f, int flag)      //stampa gli indirizi 
 {
     int i, j;
-    if (flag == 1)
+    if (flag == 1)      //file
     {
         for (j = 0; j < 32; j++)
         {

@@ -14,13 +14,13 @@ void CreaSottoreti(int classe, int ipdec[], int ipbin[], int ns)
     FILE *f;
     if (classe == 1)
     {
-        if (ns >= pow(2, 21) || ns <= 0)
+        if (ns >= pow(2, 21) || ns <= 0)        //controlli per vedrificare se il numero di sottoreti è compatibile con la classe di indirizzi 
         {
             printf("Impossibile calcolare %d sottoreti con indirizzo %d.%d.%d.%d", ns, ipdec[0], ipdec[1], ipdec[2], ipdec[3]);
         }
         else
         {
-            CreaSottoretiA(ipdec, ipbin, ns, f);
+            CreaSottoretiA(ipdec, ipbin, ns, f);        //richiamo la funzione per calcolare le sottoreti relativa ad ogni classe 
         }
     }
     else
@@ -67,8 +67,8 @@ void CreaSottoretiC(int ipdec[], int ipbin[], int ns, FILE *f)
         i++;
     int BitRete = i;
     pot = pow(2, i);
-    pot = 256 / pot;
     long dim = pot * sizeof(int);
+    pot = 256 / pot;
     br = (int *)malloc(dim);
     nid = (int *)malloc(dim);
     int nidTMP = 0, brTMP = 0;
@@ -82,7 +82,7 @@ void CreaSottoretiC(int ipdec[], int ipbin[], int ns, FILE *f)
         if (errore(f) == 0)
         {
             f = fopen("SottoretiMFissa.txt", "w");
-            fprintf(f, "Andrea Cazzato 4INA");
+            fprintf(f, "Andrea Cazzato 4INA\n");
             printf("\nFile aperto in scrittura\n");
         }
         else
@@ -93,7 +93,7 @@ void CreaSottoretiC(int ipdec[], int ipbin[], int ns, FILE *f)
 
         time_t t = time(NULL);
         struct tm tm = *localtime(&t);
-        fprintf(f, "Classe c %d sottoreti\n", ns);
+        fprintf(f, "\nClasse c %d sottoreti\n", ns);
         fprintf(f, "Sottoreti create in data: %d-%02d-%02d orario: %02d:%02d:%02d\n", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
     }
     else
@@ -200,7 +200,7 @@ int CreaSottoretiA(int ipdec[], int ipbin[], int ns, FILE *f)
         fprintf(f, "Sottoreti create in data: \n%d-%02d-%02d orario: %02d:%02d:%02d\n", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour + 1, tm.tm_min, tm.tm_sec);
     }
     else
-        printf("Non salverò su file.");
+        printf("\nNon salverò su file.\n");
 
     while (pow(2, i) <= ns)
         i++;
@@ -226,6 +226,7 @@ int CreaSottoretiA(int ipdec[], int ipbin[], int ns, FILE *f)
         printf("1) Decimale\n2) Binario");
 
         scanf("%d", &scelta);
+        system("cls");
         switch (scelta)
         {
         case 1:
